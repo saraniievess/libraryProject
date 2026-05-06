@@ -1,5 +1,5 @@
 <?php
-namespace reseña;
+namespace resena\model;
 
 class review {
     public function __construct(string $_title, string $_user, int $_ranking, \DateTime $_finished_date, string $_info) {
@@ -50,10 +50,58 @@ class review {
         return $this->info;
     }
 
+    public function get_id() : int {
+        return $this->id;
+    }
+
+    public function set_id(int $_id) : void {
+        if ($_id <= 0) {
+            throw new \Exception("id must be positive");
+        }
+        $this->id = $_id;
+    }
+
+    public function set_title(string $_title) : void {
+        $_title = trim($_title);
+        if ($_title === "") {
+            throw new \Exception("title cannot be empty");
+        }
+        $this->title = $_title;
+    }
+
+    public function set_user(string $_user) : void {
+        $_user = trim($_user);
+        if ($_user === "") {
+            throw new \Exception("user cannot be empty");
+        }
+        $this->user = $_user;
+    }
+
+    public function set_ranking(int $_ranking) : void {
+        if ($_ranking < 1 || $_ranking > 5) {
+            throw new \Exception("ranking must be between 1 and 5");
+        }
+        $this->ranking = $_ranking;
+    }
+
+    public function set_finished_date(\DateTime $_finished_date) : void {
+        $min = \DateTime::createFromFormat("d-m-Y", "01-01-1900");
+        $max = new \DateTime();
+        if ($_finished_date < $min || $_finished_date > $max) {
+            throw new \Exception("the date must be realistic");
+        }
+        $this->finished_date = $_finished_date;
+    }
+
+    public function set_info(string $_info) : void {
+        $this->info = trim($_info);
+    }
+
 
     private string $title;
     private string $user;
     private int $ranking;
     private \DateTime $finished_date;
     private string $info;
+    private int $id;
 }

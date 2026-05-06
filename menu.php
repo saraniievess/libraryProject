@@ -15,10 +15,18 @@ require("src/autoload.php");
 use catalogo\model\book;
 use catalogo\database\book_repository;
 use tools\input_handler;
+use resena\model\user;
+use resena\database\user_repository;
+use resena\model\review;
+use resena\database\review_repository;
 
 $books=[];
+$users=[];
+$reviews=[];
 
-$pdo = new book_repository($database_connection);
+$pdo_book = new book_repository($database_connection);
+$pdo_user = new user_repository($database_connection);
+$pdo_review = new review_repository($database_connection);
 $input = new input_handler();
 
 while (true) {
@@ -26,7 +34,15 @@ while (true) {
     echo "2) List books".PHP_EOL;
     echo "3) Delete book".PHP_EOL;
     echo "4) Update book".PHP_EOL;
-    echo "5) Exit".PHP_EOL;
+    echo "5) Add user".PHP_EOL;
+    echo "6) List user".PHP_EOL;
+    echo "7) Delete user".PHP_EOL;
+    echo "8) Update user".PHP_EOL;
+    echo "9) Add review".PHP_EOL;
+    echo "10) List reviews".PHP_EOL;
+    echo "11) Delete review".PHP_EOL;
+    echo "12) Update review".PHP_EOL;
+    echo "13) Exit".PHP_EOL;
     $_opcion = $input->read();
 
     switch ($_opcion) {
@@ -51,14 +67,14 @@ while (true) {
             try {
                 $_book = new book($_author, $_title, $_house, $_genre, $pages);
                 $books[] = $_book;
-                $pdo->insertBook($_book);
+                $pdo_book->insertBook($_book);
             }
             catch(\Exception $e) {
                 echo "something failed: {$e->getMessage()}".PHP_EOL;
             }
             break;
         case 2:
-            $books=$pdo->getAllBooks();
+            $books=$pdo_book->getAllBooks();
             foreach ($books as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
@@ -69,7 +85,7 @@ while (true) {
             if ($_title==="") {
                 throw new \Exception("title cannot be empty");
             }
-            $foundBooks=$pdo->findBooksByTitle($_title);
+            $foundBooks=$pdo_book->findBooksByTitle($_title);
             foreach ($foundBooks as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
@@ -84,7 +100,7 @@ while (true) {
             try {
                 foreach ($foundBooks as $book) {
                     if ($book->get_id()===$id) {
-                        $pdo->deleteBook($book);
+                        $pdo_book->deleteBook($book);
                     }
                 }
             }
@@ -98,7 +114,7 @@ while (true) {
             if ($_title==="") {
                 throw new \Exception("title cannot be empty");
             }
-            $foundBooks=$pdo->findBooksByTitle($_title);
+            $foundBooks=$pdo_book->findBooksByTitle($_title);
             foreach ($foundBooks as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
@@ -162,7 +178,7 @@ while (true) {
                                     break;
                             }
                         }
-                        $pdo->updateBook($book);
+                        $pdo_book->updateBook($book);
                     }
                 }
                 if (!$found) {
@@ -174,6 +190,244 @@ while (true) {
             }
             break;
         case 5:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            echo "Enter the date of birth (YYYY-mm-dd): ".PHP_EOL;
+            $_date = $input->read();
+            if($_date === "") {
+                throw new \Exception("date of birth cannot be empty");
+            }
+            $date= new \DateTime($_date);
+            try {
+                $user = new user($_name, $date);
+                $users[] = $user;
+                $pdo_user->insertUser($user);
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 6:
+            $users=$pdo_user->getAllUsers();
+            foreach ($users as $user) {
+                echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
+            }
+            break;
+        case 7:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            if ($_name==="") {
+                throw new \Exception("name cannot be empty");
+            }
+            $foundUsers=$pdo_user->findUserByName($_name);
+            foreach ($foundUsers as $user) {
+                echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            if (is_numeric($_id)) {
+                $id = (int) $_id;
+            } else {
+                throw new \Exception("please enter a valid number");
+            }
+            try {
+                foreach ($foundUsers as $user) {
+                    if ($user->get_id()===$id) {
+                        $pdo_user->deleteUser($user);
+                    }
+                }
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 8:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            if ($_name==="") {
+                throw new \Exception("name cannot be empty");
+            }
+            $foundUsers=$pdo_user->findUserByName($_name);
+            foreach ($foundUsers as $user) {
+                echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            if (is_numeric($_id)) {
+                $id = (int) $_id;
+            } else {
+                throw new \Exception("please enter a valid number");
+            }
+            try {
+                $found=false;
+                foreach ($foundUsers as $user) {
+                    if ($user->get_id()===$id) {
+                        while (true) {
+                            $found=true;
+                            echo "What do you want to do?".PHP_EOL;
+                            echo "1) Change name".PHP_EOL;
+                            echo "2) Change date of birth".PHP_EOL;
+                            echo "3) Nothing".PHP_EOL;
+                            $_opcion = $input->read();
+
+                            switch ($_opcion) {
+                                case 1:
+                                    echo "New name: ".PHP_EOL;
+                                    $_name = $input->read();
+                                    $user->set_name($_name);
+                                    break;
+                                case 2:
+                                    echo "New date of birth: ".PHP_EOL;
+                                    $_date = $input->read();
+                                    $date = new \DateTime($_date);
+                                    $user->set_birthdate($date);
+                                    break;
+                                case 3:
+                                    break(2);
+                                default:
+                                    echo "please enter a valid number".PHP_EOL;
+                                    break;
+                            }
+                        }
+                        $pdo_user->updateUser($user);
+                    }
+                }
+                if (!$found) {
+                    echo "user not found".PHP_EOL;
+                }
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 9:
+            echo "Book title: ".PHP_EOL;
+            $_title = $input->read();
+            echo "User: ".PHP_EOL;
+            $_user = $input->read();
+            echo "Ranking (1-5): ".PHP_EOL;
+            $_ranking = $input->read();
+            echo "Finished date (YYYY-mm-dd): ".PHP_EOL;
+            $_date = $input->read();
+            echo "Info: ".PHP_EOL;
+            $_info = $input->read();
+            if (!is_numeric($_ranking)) {
+                throw new \Exception("ranking must be numeric");
+            }
+            $ranking = (int)$_ranking;
+            $date = new \DateTime($_date);
+            try {
+                $review = new review(
+                    $_title,
+                    $_user,
+                    $ranking,
+                    $date,
+                    $_info
+                );
+                $pdo_review->insertReview($review);
+            } catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 10:
+            $reviews = $pdo_review->getAllReviews();
+            foreach ($reviews as $review) {
+                echo
+                "ID: {$review->get_id()} | ".
+                "{$review->get_title()} | ".
+                "{$review->get_user()} | ".
+                "Ranking: {$review->get_ranking()} | ".
+                "Finished: {$review->get_finished_date()->format('Y-m-d')} | ".
+                "{$review->get_info()}".PHP_EOL;
+            }
+            break;
+        case 11:
+            echo "Review title: ".PHP_EOL;
+            $_title = $input->read();
+            $foundReviews = $pdo_review->findReviewByTitle($_title);
+            foreach ($foundReviews as $review) {
+                echo
+                "ID: {$review->get_id()} | ".
+                "{$review->get_title()} | ".
+                "{$review->get_user()} | ".
+                "Ranking: {$review->get_ranking()} | ".
+                "Finished: {$review->get_finished_date()->format('Y-m-d')} | ".
+                "{$review->get_info()}".PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            $id = (int)$_id;
+            foreach ($foundReviews as $review) {
+                if ($review->get_id() === $id) {
+                    $pdo_review->deleteReview($review);
+                }
+            }
+            break;
+        case 12:
+            echo "Review title: ".PHP_EOL;
+            $_title = $input->read();
+            $foundReviews = $pdo_review->findReviewByTitle($_title);
+            foreach ($foundReviews as $review) {
+                echo
+                "ID: {$review->get_id()} | ".
+                "{$review->get_title()} | ".
+                "{$review->get_user()} | ".
+                "Ranking: {$review->get_ranking()} | ".
+                "Finished: {$review->get_finished_date()->format('Y-m-d')} | ".
+                "{$review->get_info()}".PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            $id = (int)$_id;
+            foreach ($foundReviews as $review) {
+                if ($review->get_id() === $id) {
+                while (true) {
+                    echo "What do you want to change?".PHP_EOL;
+                    echo "1) Title".PHP_EOL;
+                    echo "2) User".PHP_EOL;
+                    echo "3) Ranking".PHP_EOL;
+                    echo "4) Info".PHP_EOL;
+                    echo "5) Finished date".PHP_EOL;
+                    echo "6) Nothing".PHP_EOL;
+                    $_opcion = $input->read();
+                    switch ($_opcion) {
+                        case 1:
+                            echo "New title: ".PHP_EOL;
+                            $_title = $input->read();
+                            $review->set_title($_title);
+                            break;
+                        case 2:
+                            echo "New user: ".PHP_EOL;
+                            $_user = $input->read();
+                            $review->set_user($_user);
+                            break;
+                        case 3:
+                            echo "New ranking: ".PHP_EOL;
+                            $_ranking = $input->read();
+                            $review->set_ranking((int)$_ranking);
+                            break;
+                        case 4:
+                            echo "New info: ".PHP_EOL;
+                            $_info = $input->read();
+                            $review->set_info($_info);
+                            break;
+                        case 5:
+                            $_date = $input->read();
+                            $date = new \DateTime($_date);
+                            $user->set_birthdate($date);
+                            break;
+                        case 6:
+                            break(2);
+                        default:
+                            echo "please enter a valid number".PHP_EOL;
+                            break;
+                    }
+                }
+                $pdo_review->updateReview($review);
+                }
+            }
+            break;
+        case 13:
             exit(0);
         default:
             echo "please enter a valid number".PHP_EOL;

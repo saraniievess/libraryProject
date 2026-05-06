@@ -15,13 +15,13 @@ class book_repository {
         $this->pdo = $_pdo;
     }
 
+    //AÑADIR ID
     public function insertBook (book $book) : void {
             if ($this->insertStatement === null) {
                 $this->insertStatement = $this->pdo->prepare(
                     "INSERT INTO book (author, title, house, genre, page_count)
                     VALUES (:author, :title, :house, :genre, :page_count)");
             }
-
             $this->insertStatement->execute([
                 ":author" => $book->get_author(),
                 ":title" => $book->get_title(),
@@ -75,7 +75,7 @@ class book_repository {
             $this->findBooksByTitleStatement = $this->pdo->prepare("SELECT * FROM book WHERE title LIKE :title");
         }
         $this->findBooksByTitleStatement->execute([
-            ":title" => "{$title}"
+            ":title" => "%{$title}%"
         ]);
         $rows = $this->findBooksByTitleStatement->fetchAll();
 
@@ -120,5 +120,5 @@ class book_repository {
         }
 
         return $books;
-        }
+    }
 }
