@@ -8,6 +8,8 @@ class book_repository {
     private \PDO $pdo;
     private ?\PDOStatement $insertStatement = null;
     private ?\PDOStatement $deleteStatement = null;
+    private ?\PDOStatement $updateStatement = null;
+    private ?\PDOStatement $findBooksByTitleStatement = null;
 
     public function __construct(\PDO $_pdo) {
         $this->pdo = $_pdo;
@@ -29,11 +31,36 @@ class book_repository {
             ]);
     }
 
-    public function deleteBook (int $id) : void {
+    public function updateBook (book $book) : void {
+        if ($this->updateStatement === null) {
+            $this->updateStatement = $this->pdo->prepare
+            ("UPDATE book SET
+                title = :title,
+                author = :author,
+                house = :house,
+                genre = :genre,
+                page_count = :page_count
+            WHERE id = :id");
+        }
+        $this->updateStatement->execute([
+            ":title" => $book->get_title(),
+            ":author" => $book->get_author(),
+            ":house" => $book->get_house(),
+            ":genre" => $book->get_genre(),
+            ":page_count" => $book->get_page_count(),
+            ":id" => $book->get_id()
+        ]);
+
+        if ($this->updateStatement->rowCount() === 0) {
+            throw new \Exception("book not found");
+        }
+    }
+
+    public function deleteBook (book $book) : void {
         if ($this->deleteStatement === null) {
             $this->deleteStatement = $this->pdo->prepare("DELETE FROM book WHERE id = :id");
         }
-        $this->deleteStatement->execute([":id" => $id]);
+        $this->deleteStatement->execute([":id" => $book->get_id()]);
 
         if ($this->deleteStatement->rowCount() === 0) {
             throw new \Exception("book not found");
@@ -44,12 +71,13 @@ class book_repository {
      * @return book[]
      */
     public function findBooksByTitle(string $title): array {
-        $stm = $this->pdo->prepare("SELECT * FROM book WHERE title LIKE :title");
-
-        $stm->execute([
-            ":title" => "%{$title}%"
+        if ($this->findBooksByTitleStatement === null) {
+            $this->findBooksByTitleStatement = $this->pdo->prepare("SELECT * FROM book WHERE title LIKE :title");
+        }
+        $this->findBooksByTitleStatement->execute([
+            ":title" => "{$title}"
         ]);
-        $rows = $stm->fetchAll();
+        $rows = $this->findBooksByTitleStatement->fetchAll();
 
         $books = [];
 
