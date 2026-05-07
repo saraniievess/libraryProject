@@ -15,17 +15,21 @@ class user_repository {
         $this->pdo = $_pdo;
     }
 
-    //AÑADIR ID
     public function insertUser (user $user) : void {
-            if ($this->insertStatement === null) {
-                $this->insertStatement = $this->pdo->prepare(
-                    "INSERT INTO users (name, date_birthday)
-                    VALUES (:name, :date)");
-            }
-            $this->insertStatement->execute([
-                ":name" => $user->get_name(),
-                ":date" => $user->get_birthdate()->format('Y-m-d')
-            ]);
+        if ($this->insertStatement === null) {
+            $this->insertStatement = $this->pdo->prepare(
+                "INSERT INTO users (name, date_birthday)
+                VALUES (:name, :date)");
+        }
+        $this->insertStatement->execute([
+            ":name" => $user->get_name(),
+            ":date" => $user->get_birthdate()->format('Y-m-d')
+        ]);
+        $statement = $this->pdo->query(
+            "SELECT id FROM users ORDER BY id DESC LIMIT 1"
+        );
+        $id = (int)$statement->fetchColumn();
+        $book->set_id($id);
     }
 
     /**

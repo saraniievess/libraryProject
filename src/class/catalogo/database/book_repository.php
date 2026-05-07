@@ -15,20 +15,24 @@ class book_repository {
         $this->pdo = $_pdo;
     }
 
-    //AÑADIR ID
     public function insertBook (book $book) : void {
-            if ($this->insertStatement === null) {
-                $this->insertStatement = $this->pdo->prepare(
-                    "INSERT INTO book (author, title, house, genre, page_count)
-                    VALUES (:author, :title, :house, :genre, :page_count)");
-            }
-            $this->insertStatement->execute([
-                ":author" => $book->get_author(),
-                ":title" => $book->get_title(),
-                ":house" => $book->get_house(),
-                ":genre" => $book->get_genre(),
-                ":page_count" => $book->get_page_count()
-            ]);
+        if ($this->insertStatement === null) {
+            $this->insertStatement = $this->pdo->prepare(
+                "INSERT INTO book (author, title, house, genre, page_count)
+                VALUES (:author, :title, :house, :genre, :page_count)");
+        }
+        $this->insertStatement->execute([
+            ":author" => $book->get_author(),
+            ":title" => $book->get_title(),
+            ":house" => $book->get_house(),
+            ":genre" => $book->get_genre(),
+            ":page_count" => $book->get_page_count()
+        ]);
+        $statement = $this->pdo->query(
+            "SELECT id FROM book ORDER BY id DESC LIMIT 1"
+        );
+        $id = (int)$statement->fetchColumn();
+        $book->set_id($id);
     }
 
     public function updateBook (book $book) : void {

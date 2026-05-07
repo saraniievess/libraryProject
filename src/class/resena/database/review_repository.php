@@ -15,14 +15,11 @@ class review_repository {
         $this->pdo = $_pdo;
     }
 
-    //AÑADIR ID
     public function insertReview (review $review) : void {
         if ($this->insertStatement === null) {
             $this->insertStatement = $this->pdo->prepare(
-                "INSERT INTO reviews
-                (title, user, ranking, finished_date, info)
-                VALUES
-                (:title, :user, :ranking, :finished_date, :info)"
+                "INSERT INTO reviews (title, user, ranking, finished_date, info)
+                VALUES (:title, :user, :ranking, :finished_date, :info)"
             );
         }
         $this->insertStatement->execute([
@@ -32,6 +29,11 @@ class review_repository {
             ":finished_date" => $review->get_finished_date()->format('Y-m-d'),
             ":info" => $review->get_info()
         ]);
+        $statement = $this->pdo->query(
+            "SELECT id FROM review ORDER BY id DESC LIMIT 1"
+        );
+        $id = (int)$statement->fetchColumn();
+        $book->set_id($id);
     }
 
     /**
