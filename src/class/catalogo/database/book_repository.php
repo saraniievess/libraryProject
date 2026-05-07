@@ -31,6 +31,9 @@ class book_repository {
         $statement = $this->pdo->query(
             "SELECT id FROM book ORDER BY id DESC LIMIT 1"
         );
+        if ($statement === false) {
+            throw new \Exception("database query failed");
+        }
         $id = (int)$statement->fetchColumn();
         $book->set_id($id);
     }

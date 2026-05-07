@@ -30,10 +30,13 @@ class review_repository {
             ":info" => $review->get_info()
         ]);
         $statement = $this->pdo->query(
-            "SELECT id FROM review ORDER BY id DESC LIMIT 1"
+            "SELECT id FROM reviews ORDER BY id DESC LIMIT 1"
         );
+        if ($statement === false) {
+            throw new \Exception("database query failed");
+        }
         $id = (int)$statement->fetchColumn();
-        $book->set_id($id);
+        $review->set_id($id);
     }
 
     /**
@@ -41,15 +44,11 @@ class review_repository {
      */
     public function getAllReviews() : array {
         $statement = $this->pdo->query("SELECT * FROM reviews");
-
         if ($statement === false) {
             throw new \Exception("database query failed");
         }
-
         $reviews = [];
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             $review = new review(
                 $row['title'],
                 $row['user'],
@@ -57,12 +56,9 @@ class review_repository {
                 new \DateTime($row['finished_date']),
                 $row['info']
             );
-
             $review->set_id((int)$row['id']);
-
             $reviews[] = $review;
         }
-
         return $reviews;
     }
 

@@ -414,7 +414,7 @@ while (true) {
                         case 5:
                             $_date = $input->read();
                             $date = new \DateTime($_date);
-                            $user->set_birthdate($date);
+                            $review->set_finished_date($date);
                             break;
                         case 6:
                             break(2);
