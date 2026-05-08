@@ -20,13 +20,9 @@ use resena\database\user_repository;
 use resena\model\review;
 use resena\database\review_repository;
 
-$books=[];
-$users=[];
-$reviews=[];
-
-$pdo_book = new book_repository($database_connection);
-$pdo_user = new user_repository($database_connection);
-$pdo_review = new review_repository($database_connection);
+$bookRepository = new book_repository($database_connection);
+$userRepository = new user_repository($database_connection);
+$reviewRepository = new review_repository($database_connection);
 $input = new input_handler();
 
 while (true) {
@@ -65,16 +61,15 @@ while (true) {
             $pages=(int) $_pages;
 
             try {
-                $_book = new book($_author, $_title, $_house, $_genre, $pages);
-                $books[] = $_book;
-                $pdo_book->insertBook($_book);
+                $book = new book($_author, $_title, $_house, $_genre, $pages);
+                $bookRepository->insert($book);
             }
             catch(\Exception $e) {
                 echo "something failed: {$e->getMessage()}".PHP_EOL;
             }
             break;
         case 2:
-            $books=$pdo_book->getAllBooks();
+            $books=$bookRepository->getAllBooks();
             foreach ($books as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
@@ -85,13 +80,13 @@ while (true) {
             if ($_title==="") {
                 throw new \Exception("title cannot be empty");
             }
-            $foundBooks=$pdo_book->findBooksByTitle($_title);
+            $foundBooks=$bookRepository->findBooksByTitle($_title);
             foreach ($foundBooks as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
             echo "Enter id: ".PHP_EOL;
             $_id = $input->read();
-            if (is_numeric($_id)) {
+            if (ctype_digit($_id)) {
                 $id = (int) $_id;
             } else {
                 throw new \Exception("please enter a valid number");
@@ -100,7 +95,7 @@ while (true) {
             try {
                 foreach ($foundBooks as $book) {
                     if ($book->get_id()===$id) {
-                        $pdo_book->deleteBook($book);
+                        $bookRepository->delete($book);
                     }
                 }
             }
@@ -114,13 +109,13 @@ while (true) {
             if ($_title==="") {
                 throw new \Exception("title cannot be empty");
             }
-            $foundBooks=$pdo_book->findBooksByTitle($_title);
+            $foundBooks=$bookRepository->findBooksByTitle($_title);
             foreach ($foundBooks as $book) {
                 echo "ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()}" . PHP_EOL;
             }
             echo "Enter id: ".PHP_EOL;
             $_id = $input->read();
-            if (is_numeric($_id)) {
+            if (ctype_digit($_id)) {
                 $id = (int) $_id;
             } else {
                 throw new \Exception("please enter a valid number");
@@ -164,7 +159,7 @@ while (true) {
                                 case 5:
                                     echo "New page count: ".PHP_EOL;
                                     $_page_count = $input->read();
-                                    if (is_numeric($_page_count)) {
+                                    if (ctype_digit($_page_count)) {
                                         $page_count = (int) $_page_count;
                                         $book->set_page_count($page_count);
                                     } else {
@@ -178,7 +173,7 @@ while (true) {
                                     break;
                             }
                         }
-                        $pdo_book->updateBook($book);
+                        $bookRepository->update($book);
                     }
                 }
                 if (!$found) {
@@ -200,15 +195,14 @@ while (true) {
             $date= new \DateTime($_date);
             try {
                 $user = new user($_name, $date);
-                $users[] = $user;
-                $pdo_user->insertUser($user);
+                $userRepository->insert($user);
             }
             catch(\Exception $e) {
                 echo "something failed: {$e->getMessage()}".PHP_EOL;
             }
             break;
         case 6:
-            $users=$pdo_user->getAllUsers();
+            $users=$userRepository->getAllUsers();
             foreach ($users as $user) {
                 echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
             }
@@ -219,13 +213,13 @@ while (true) {
             if ($_name==="") {
                 throw new \Exception("name cannot be empty");
             }
-            $foundUsers=$pdo_user->findUserByName($_name);
+            $foundUsers=$userRepository->findUserByName($_name);
             foreach ($foundUsers as $user) {
                 echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
             }
             echo "Enter id: ".PHP_EOL;
             $_id = $input->read();
-            if (is_numeric($_id)) {
+            if (ctype_digit($_id)) {
                 $id = (int) $_id;
             } else {
                 throw new \Exception("please enter a valid number");
@@ -233,7 +227,7 @@ while (true) {
             try {
                 foreach ($foundUsers as $user) {
                     if ($user->get_id()===$id) {
-                        $pdo_user->deleteUser($user);
+                        $userRepository->delete($user);
                     }
                 }
             }
@@ -247,13 +241,13 @@ while (true) {
             if ($_name==="") {
                 throw new \Exception("name cannot be empty");
             }
-            $foundUsers=$pdo_user->findUserByName($_name);
+            $foundUsers=$userRepository->findUserByName($_name);
             foreach ($foundUsers as $user) {
                 echo "ID: {$user->get_id()} | {$user->get_name()} -> {$user->get_birthdate()->format('Y-m-d')}" . PHP_EOL;
             }
             echo "Enter id: ".PHP_EOL;
             $_id = $input->read();
-            if (is_numeric($_id)) {
+            if (ctype_digit($_id)) {
                 $id = (int) $_id;
             } else {
                 throw new \Exception("please enter a valid number");
@@ -289,7 +283,7 @@ while (true) {
                                     break;
                             }
                         }
-                        $pdo_user->updateUser($user);
+                        $userRepository->update($user);
                     }
                 }
                 if (!$found) {
@@ -311,7 +305,7 @@ while (true) {
             $_date = $input->read();
             echo "Info: ".PHP_EOL;
             $_info = $input->read();
-            if (!is_numeric($_ranking)) {
+            if (!ctype_digit($_ranking)) {
                 throw new \Exception("ranking must be numeric");
             }
             $ranking = (int)$_ranking;
@@ -324,13 +318,13 @@ while (true) {
                     $date,
                     $_info
                 );
-                $pdo_review->insertReview($review);
+                $reviewRepository->insert($review);
             } catch(\Exception $e) {
                 echo "something failed: {$e->getMessage()}".PHP_EOL;
             }
             break;
         case 10:
-            $reviews = $pdo_review->getAllReviews();
+            $reviews = $reviewRepository->getAllReviews();
             foreach ($reviews as $review) {
                 echo
                 "ID: {$review->get_id()} | ".
@@ -344,7 +338,7 @@ while (true) {
         case 11:
             echo "Review title: ".PHP_EOL;
             $_title = $input->read();
-            $foundReviews = $pdo_review->findReviewByTitle($_title);
+            $foundReviews = $reviewRepository->findReviewByTitle($_title);
             foreach ($foundReviews as $review) {
                 echo
                 "ID: {$review->get_id()} | ".
@@ -359,14 +353,14 @@ while (true) {
             $id = (int)$_id;
             foreach ($foundReviews as $review) {
                 if ($review->get_id() === $id) {
-                    $pdo_review->deleteReview($review);
+                    $reviewRepository->delete($review);
                 }
             }
             break;
         case 12:
             echo "Review title: ".PHP_EOL;
             $_title = $input->read();
-            $foundReviews = $pdo_review->findReviewByTitle($_title);
+            $foundReviews = $reviewRepository->findReviewByTitle($_title);
             foreach ($foundReviews as $review) {
                 echo
                 "ID: {$review->get_id()} | ".
@@ -412,6 +406,7 @@ while (true) {
                             $review->set_info($_info);
                             break;
                         case 5:
+                            echo "New finished date: ".PHP_EOL;
                             $_date = $input->read();
                             $date = new \DateTime($_date);
                             $review->set_finished_date($date);
@@ -423,7 +418,7 @@ while (true) {
                             break;
                     }
                 }
-                $pdo_review->updateReview($review);
+                $reviewRepository->update($review);
                 }
             }
             break;

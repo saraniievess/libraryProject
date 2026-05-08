@@ -1,25 +1,57 @@
 <?php
 namespace catalogo\model;
 
-class book {
+use database\model;
+
+class book implements model {
+
+    //------------------------------------------------------------------
+    public function get_tablename() : string {
+        return "book";
+    }
+
+    public function get_field_list() : array {
+        return ["author", "title", "house", "genre", "page_count"];
+    }
+
+    public function get_statement_args() : array {
+        return [
+            ":author" => $this->get_author(),
+            ":title" => $this->get_title(),
+            ":house" => $this->get_house(),
+            ":genre" => $this->get_genre(),
+            ":page_count" => $this->get_page_count()
+        ];
+    }
+
+    public function set_id(int $id) : void {
+        if ($id > 0) {
+            $this->id=$id;
+        } else {
+            throw new \Exception("id must be larger than zero");
+        }
+    }
+
+    public function get_id() : int {
+        return $this->id;
+    }
+    //------------------------------------------------------------------
+
     public function __construct(string $_author, string $_title, string $_house, string $_genre, int $_page_count) {
         if($_author === "") {
             throw new \Exception("author cannot be empty");
         }
         $this->author=trim($_author);
-
         
         if($_title === "") {
             throw new \Exception("title cannot be empty");
         }
         $this->title=trim($_title);
         
-        
         if($_house === "") {
             throw new \Exception("house cannot be empty");
         }
         $this->house=trim($_house);
-
         
         if($_genre === "") {
             throw new \Exception("genre cannot be empty");
@@ -51,10 +83,6 @@ class book {
 
     public function get_page_count() : int {
         return $this->page_count;
-    }
-
-    public function get_id() : int {
-        return $this->id;
     }
 
     public function set_author(string $author): void {
@@ -94,14 +122,6 @@ class book {
             throw new \Exception("page count must be larger than zero");
         }
         $this->page_count = $page_count;
-    }
-
-    public function set_id(int $id) : void {
-        if (0<=$id) {
-            $this->id=$id;
-        } else {
-            throw new \Exception("id must be larger than zero");
-        }
     }
 
     private int $id=0;

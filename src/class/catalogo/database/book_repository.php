@@ -3,76 +3,18 @@
 namespace catalogo\database;
 
 use catalogo\model\book;
+use database\repository;
 
-class book_repository {
+class book_repository extends repository {
     private \PDO $pdo;
-    private ?\PDOStatement $insertStatement = null;
-    private ?\PDOStatement $deleteStatement = null;
-    private ?\PDOStatement $updateStatement = null;
     private ?\PDOStatement $findBooksByTitleStatement = null;
 
+
     public function __construct(\PDO $_pdo) {
+        parent::__construct($_pdo);
         $this->pdo = $_pdo;
     }
 
-    public function insertBook (book $book) : void {
-        if ($this->insertStatement === null) {
-            $this->insertStatement = $this->pdo->prepare(
-                "INSERT INTO book (author, title, house, genre, page_count)
-                VALUES (:author, :title, :house, :genre, :page_count)");
-        }
-        $this->insertStatement->execute([
-            ":author" => $book->get_author(),
-            ":title" => $book->get_title(),
-            ":house" => $book->get_house(),
-            ":genre" => $book->get_genre(),
-            ":page_count" => $book->get_page_count()
-        ]);
-        $statement = $this->pdo->query(
-            "SELECT id FROM book ORDER BY id DESC LIMIT 1"
-        );
-        if ($statement === false) {
-            throw new \Exception("database query failed");
-        }
-        $id = (int)$statement->fetchColumn();
-        $book->set_id($id);
-    }
-
-    public function updateBook (book $book) : void {
-        if ($this->updateStatement === null) {
-            $this->updateStatement = $this->pdo->prepare
-            ("UPDATE book SET
-                title = :title,
-                author = :author,
-                house = :house,
-                genre = :genre,
-                page_count = :page_count
-            WHERE id = :id");
-        }
-        $this->updateStatement->execute([
-            ":title" => $book->get_title(),
-            ":author" => $book->get_author(),
-            ":house" => $book->get_house(),
-            ":genre" => $book->get_genre(),
-            ":page_count" => $book->get_page_count(),
-            ":id" => $book->get_id()
-        ]);
-
-        if ($this->updateStatement->rowCount() === 0) {
-            throw new \Exception("book not found");
-        }
-    }
-
-    public function deleteBook (book $book) : void {
-        if ($this->deleteStatement === null) {
-            $this->deleteStatement = $this->pdo->prepare("DELETE FROM book WHERE id = :id");
-        }
-        $this->deleteStatement->execute([":id" => $book->get_id()]);
-
-        if ($this->deleteStatement->rowCount() === 0) {
-            throw new \Exception("book not found");
-        }
-    }
 
     /**
      * @return book[]

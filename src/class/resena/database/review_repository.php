@@ -3,41 +3,18 @@
 namespace resena\database;
 
 use resena\model\review;
+use database\repository;
 
-class review_repository {
+class review_repository extends repository {
     private \PDO $pdo;
-    private ?\PDOStatement $insertStatement = null;
-    private ?\PDOStatement $deleteStatement = null;
-    private ?\PDOStatement $updateStatement = null;
     private ?\PDOStatement $findReviewsByTitleStatement = null;
 
+
     public function __construct(\PDO $_pdo) {
+        parent::__construct($_pdo);
         $this->pdo = $_pdo;
     }
 
-    public function insertReview (review $review) : void {
-        if ($this->insertStatement === null) {
-            $this->insertStatement = $this->pdo->prepare(
-                "INSERT INTO reviews (title, user, ranking, finished_date, info)
-                VALUES (:title, :user, :ranking, :finished_date, :info)"
-            );
-        }
-        $this->insertStatement->execute([
-            ":title" => $review->get_title(),
-            ":user" => $review->get_user(),
-            ":ranking" => $review->get_ranking(),
-            ":finished_date" => $review->get_finished_date()->format('Y-m-d'),
-            ":info" => $review->get_info()
-        ]);
-        $statement = $this->pdo->query(
-            "SELECT id FROM reviews ORDER BY id DESC LIMIT 1"
-        );
-        if ($statement === false) {
-            throw new \Exception("database query failed");
-        }
-        $id = (int)$statement->fetchColumn();
-        $review->set_id($id);
-    }
 
     /**
      * @return review[]
@@ -88,44 +65,5 @@ class review_repository {
             $reviews[] = $review;
         }
         return $reviews;
-    }
-
-    public function updateReview (review $review) : void {
-        if ($this->updateStatement === null) {
-            $this->updateStatement = $this->pdo->prepare(
-                "UPDATE reviews SET
-                    title = :title,
-                    user = :user,
-                    ranking = :ranking,
-                    finished_date = :finished_date,
-                    info = :info
-                WHERE id = :id"
-            );
-        }
-        $this->updateStatement->execute([
-            ":title" => $review->get_title(),
-            ":user" => $review->get_user(),
-            ":ranking" => $review->get_ranking(),
-            ":finished_date" => $review->get_finished_date()->format('Y-m-d'),
-            ":info" => $review->get_info(),
-            ":id" => $review->get_id()
-        ]);
-        if ($this->updateStatement->rowCount() === 0) {
-            throw new \Exception("review not found");
-        }
-    }
-
-    public function deleteReview (review $review) : void {
-        if ($this->deleteStatement === null) {
-            $this->deleteStatement = $this->pdo->prepare(
-                "DELETE FROM reviews WHERE id = :id"
-            );
-        }
-        $this->deleteStatement->execute([
-            ":id" => $review->get_id()
-        ]);
-        if ($this->deleteStatement->rowCount() === 0) {
-            throw new \Exception("review not found");
-        }
     }
 }

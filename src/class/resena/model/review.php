@@ -1,7 +1,42 @@
 <?php
 namespace resena\model;
 
-class review {
+use database\model;
+
+class review implements model {
+
+    //------------------------------------------------------------------
+    public function get_tablename() : string {
+        return "reviews";
+    }
+
+    public function get_field_list() : array {
+        return ["title", "user", "ranking", "finished_date", "info"];
+    }
+
+    public function get_statement_args() : array {
+        return [
+            ":title" => $this->get_title(),
+            ":user" => $this->get_user(),
+            ":ranking" => $this->get_ranking(),
+            ":finished_date" => $this->get_finished_date()->format('Y-m-d'),
+            ":info" => $this->get_info()
+        ];
+    }
+
+    public function set_id(int $id) : void {
+        if ($id > 0) {
+            $this->id=$id;
+        } else {
+            throw new \Exception("id must be larger than zero");
+        }
+    }
+
+    public function get_id() : int {
+        return $this->id;
+    }
+    //------------------------------------------------------------------
+
     public function __construct(string $_title, string $_user, int $_ranking, \DateTime $_finished_date, string $_info) {
         if($_title === "") {
             throw new \Exception("title cannot be empty");
@@ -50,17 +85,6 @@ class review {
         return $this->info;
     }
 
-    public function get_id() : int {
-        return $this->id;
-    }
-
-    public function set_id(int $_id) : void {
-        if ($_id <= 0) {
-            throw new \Exception("id must be positive");
-        }
-        $this->id = $_id;
-    }
-
     public function set_title(string $_title) : void {
         $_title = trim($_title);
         if ($_title === "") {
@@ -103,5 +127,5 @@ class review {
     private int $ranking;
     private \DateTime $finished_date;
     private string $info;
-    private int $id;
+    private int $id = 0;
 }

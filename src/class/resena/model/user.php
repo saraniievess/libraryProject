@@ -1,7 +1,39 @@
 <?php
 namespace resena\model;
 
-class user {
+use database\model;
+
+class user implements model {
+
+    //------------------------------------------------------------------
+    public function get_tablename() : string {
+        return "users";
+    }
+
+    public function get_field_list() : array {
+        return ["name", "date_birthday"];
+    }
+
+    public function get_statement_args() : array {
+        return [
+            ":name" => $this->get_name(),
+            ":date_birthday" => $this->get_birthdate()->format('Y-m-d')
+        ];
+    }
+
+    public function set_id(int $id) : void {
+        if ($id > 0) {
+            $this->id=$id;
+        } else {
+            throw new \Exception("id must be larger than zero");
+        }
+    }
+
+    public function get_id() : int {
+        return $this->id;
+    }
+    //------------------------------------------------------------------
+
     public function __construct (string $_name, \DateTime $_birthdate) {
         $this->name=trim($_name);    
         if($_name === "") {
@@ -24,10 +56,6 @@ class user {
         return $this->birthdate;
     }
 
-    public function get_id() : int {
-        return $this->id;
-    }
-
     public function set_name(string $name): void {
         $name = trim($name);
         if ($name === "") {
@@ -45,15 +73,7 @@ class user {
         $this->birthdate = $_birthdate;
     }
 
-    public function set_id(int $id) : void {
-        if (0<=$id) {
-            $this->id=$id;
-        } else {
-            throw new \Exception("id must be larger than zero");
-        }
-    }
-
     private string $name;
     private \DateTime $birthdate;
-    private int $id;
+    private int $id = 0;
 }
