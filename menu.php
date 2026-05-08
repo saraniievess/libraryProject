@@ -1,11 +1,16 @@
 <?php
 declare(strict_types=1);
 
-$dsn = 'mysql:dbname=libreria;host=localhost';
-$user = 'root';
-$password = '';
-
-$database_connection = new PDO($dsn, $user, $password);
+$config = parse_ini_file("config/config.ini");
+if ($config === false) {
+    throw new Exception("config file failed");
+}
+$dsn = "mysql:dbname={$config['database']};host={$config['host']}";
+$database_connection = new PDO(
+    $dsn,
+    $config['user'],
+    $config['password']
+);
 $database_connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
 ?>
