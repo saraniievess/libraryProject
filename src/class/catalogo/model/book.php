@@ -7,7 +7,7 @@ class book implements model {
 
     //------------------------------------------------------------------
     public function get_tablename() : string {
-        return "book";
+        return self::table;
     }
 
     public function get_field_list() : array {
@@ -38,22 +38,22 @@ class book implements model {
     //------------------------------------------------------------------
 
     public function __construct(string $_author, string $_title, string $_house, string $_genre, int $_page_count) {
-        if($_author === "") {
+        if(trim($_author) === "") {
             throw new \Exception("author cannot be empty");
         }
         $this->author=trim($_author);
         
-        if($_title === "") {
+        if(trim($_title) === "") {
             throw new \Exception("title cannot be empty");
         }
         $this->title=trim($_title);
         
-        if($_house === "") {
+        if(trim($_house) === "") {
             throw new \Exception("house cannot be empty");
         }
         $this->house=trim($_house);
         
-        if($_genre === "") {
+        if(trim($_genre) === "") {
             throw new \Exception("genre cannot be empty");
         }
         $this->genre=trim($_genre);
@@ -130,4 +130,5 @@ class book implements model {
     private string $house;
     private string $genre;
     private int $page_count;
+    const table = "book";
 };

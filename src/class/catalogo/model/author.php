@@ -1,9 +1,10 @@
 <?php
-namespace resena\model;
+
+namespace catalogo\model;
 
 use database\model;
 
-class user implements model {
+class author implements model {
 
     //------------------------------------------------------------------
     public function get_tablename() : string {
@@ -11,13 +12,14 @@ class user implements model {
     }
 
     public function get_field_list() : array {
-        return ["name", "date_birthday"];
+        return ["name", "nationality", "birthdate"];
     }
 
     public function get_statement_args() : array {
         return [
             ":name" => $this->get_name(),
-            ":date_birthday" => $this->get_birthdate()->format('Y-m-d')
+            ":nationality" => $this->get_nationality(),
+            ":birthdate" => $this->get_birthdate()->format('Y-m-d')
         ];
     }
 
@@ -34,17 +36,24 @@ class user implements model {
     }
     //------------------------------------------------------------------
 
-    public function __construct (string $_name, \DateTime $_birthdate) {
+
+    public function __construct(string $_name, string $_nationality, \DateTime $_birthdate) {
         if(trim($_name) === "") {
             throw new \Exception("name cannot be empty");
         }
         $this->name=trim($_name);
+
+        if(trim($_nationality) === "") {
+            throw new \Exception("nationality cannot be empty");
+        }
+        $this->nationality = trim($_nationality);
+
         $min = \DateTime::createFromFormat("d-m-Y", "01-01-1900");
         $max = new \DateTime();
         if($_birthdate<$min || $_birthdate>$max) {
             throw new \Exception("the date must be realistic");
         }
-        $this->birthdate=$_birthdate;
+        $this->birthdate = $_birthdate;
     }
 
 
@@ -52,29 +61,41 @@ class user implements model {
         return $this->name;
     }
 
+    public function get_nationality() : string {
+        return $this->nationality;
+    }
+
     public function get_birthdate() : \DateTime {
         return $this->birthdate;
     }
 
-    public function set_name(string $name): void {
-        $name = trim($name);
-        if ($name === "") {
+    public function set_name(string $_name) : void {
+        if(trim($_name) === "") {
             throw new \Exception("name cannot be empty");
         }
-        $this->name = $name;
+        $this->name=trim($_name);
+    }
+
+    public function set_nationality(string $_nationality) : void {
+        if(trim($_nationality) === "") {
+            throw new \Exception("nationality cannot be empty");
+        }
+        $this->nationality = trim($_nationality);
     }
 
     public function set_birthdate(\DateTime $_birthdate) : void {
         $min = \DateTime::createFromFormat("d-m-Y", "01-01-1900");
         $max = new \DateTime();
-        if ($_birthdate < $min || $_birthdate > $max) {
+        if($_birthdate<$min || $_birthdate>$max) {
             throw new \Exception("the date must be realistic");
         }
         $this->birthdate = $_birthdate;
     }
 
-    private string $name;
-    private \DateTime $birthdate;
+
     private int $id = 0;
-    const table = "users";
+    private string $name;
+    private string $nationality;
+    private \DateTime $birthdate;
+    const table = "author";
 }

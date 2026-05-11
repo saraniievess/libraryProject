@@ -8,6 +8,7 @@ use database\repository;
 class review_repository extends repository {
     private \PDO $pdo;
     private ?\PDOStatement $findReviewsByTitleStatement = null;
+    private string $table = review::table;
 
 
     public function __construct(\PDO $_pdo) {
@@ -20,7 +21,7 @@ class review_repository extends repository {
      * @return review[]
      */
     public function getAllReviews() : array {
-        $statement = $this->pdo->query("SELECT * FROM reviews");
+        $statement = $this->pdo->query("SELECT * FROM {$this->table}");
         if ($statement === false) {
             throw new \Exception("database query failed");
         }
@@ -45,7 +46,7 @@ class review_repository extends repository {
     public function findReviewByTitle (string $title) : array{
         if ($this->findReviewsByTitleStatement === null) {
             $this->findReviewsByTitleStatement = $this->pdo->prepare(
-                "SELECT * FROM reviews WHERE title LIKE :title"
+                "SELECT * FROM {$this->table} WHERE title LIKE :title"
             );
         }
         $this->findReviewsByTitleStatement->execute([

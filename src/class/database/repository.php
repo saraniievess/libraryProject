@@ -8,29 +8,17 @@ class repository {
     /**
      * @var array<string, ?\PDOStatement>
      */
-    private array $insertStatements = [
-        "book" => null,
-        "reviews" => null,
-        "users" => null
-    ];
+    private array $insertStatements = [];
 
     /**
      * @var array<string, ?\PDOStatement>
      */
-    private array $updateStatements = [
-        "book" => null,
-        "reviews" => null,
-        "users" => null
-    ];
+    private array $updateStatements = [];
 
     /**
      * @var array<string, ?\PDOStatement>
      */
-    private array $deleteStatements = [
-        "book" => null,
-        "reviews" => null,
-        "users" => null
-    ];
+    private array $deleteStatements = [];
 
 
     public function __construct(\PDO $_pdo) {

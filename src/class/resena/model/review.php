@@ -7,7 +7,7 @@ class review implements model {
 
     //------------------------------------------------------------------
     public function get_tablename() : string {
-        return "reviews";
+        return self::table;
     }
 
     public function get_field_list() : array {
@@ -38,12 +38,12 @@ class review implements model {
     //------------------------------------------------------------------
 
     public function __construct(string $_title, string $_user, int $_ranking, \DateTime $_finished_date, string $_info) {
-        if($_title === "") {
+        if(trim($_title) === "") {
             throw new \Exception("title cannot be empty");
         }
         $this->title=trim($_title);
 
-        if($_user === "") {
+        if(trim($_user) === "") {
             throw new \Exception("user cannot be empty");
         }
         $this->user=trim($_user);
@@ -128,4 +128,5 @@ class review implements model {
     private \DateTime $finished_date;
     private string $info;
     private int $id = 0;
+    const table = "reviews";
 }

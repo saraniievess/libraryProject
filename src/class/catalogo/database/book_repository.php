@@ -8,6 +8,7 @@ use database\repository;
 class book_repository extends repository {
     private \PDO $pdo;
     private ?\PDOStatement $findBooksByTitleStatement = null;
+    private string $table = book::table;
 
 
     public function __construct(\PDO $_pdo) {
@@ -21,7 +22,7 @@ class book_repository extends repository {
      */
     public function findBooksByTitle(string $title): array {
         if ($this->findBooksByTitleStatement === null) {
-            $this->findBooksByTitleStatement = $this->pdo->prepare("SELECT * FROM book WHERE title LIKE :title");
+            $this->findBooksByTitleStatement = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE title LIKE :title");
         }
         $this->findBooksByTitleStatement->execute([
             ":title" => "%{$title}%"
@@ -50,7 +51,7 @@ class book_repository extends repository {
      * @return book[]
      */
     public function getAllBooks() : array {
-        $statement = $this->pdo->query("SELECT * FROM book");
+        $statement = $this->pdo->query("SELECT * FROM {$this->table}");
         if ($statement === false) {
             throw new \Exception("database query failed");
         }

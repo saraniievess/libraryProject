@@ -12,7 +12,6 @@ $database_connection = new PDO(
     $config['password']
 );
 $database_connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
 ?>
 <?php
 require("src/autoload.php");
@@ -24,10 +23,13 @@ use resena\model\user;
 use resena\database\user_repository;
 use resena\model\review;
 use resena\database\review_repository;
+use catalogo\model\author;
+use catalogo\database\author_repository;
 
 $bookRepository = new book_repository($database_connection);
 $userRepository = new user_repository($database_connection);
 $reviewRepository = new review_repository($database_connection);
+$authorRepository = new author_repository($database_connection);
 $input = new input_handler();
 
 while (true) {
@@ -43,7 +45,11 @@ while (true) {
     echo "10) List reviews".PHP_EOL;
     echo "11) Delete review".PHP_EOL;
     echo "12) Update review".PHP_EOL;
-    echo "13) Exit".PHP_EOL;
+    echo "13) Add author".PHP_EOL;
+    echo "14) List authors".PHP_EOL;
+    echo "15) Delete author".PHP_EOL;
+    echo "16) Update author".PHP_EOL;
+    echo "17) Exit".PHP_EOL;
     $_opcion = $input->read();
 
     switch ($_opcion) {
@@ -428,6 +434,129 @@ while (true) {
             }
             break;
         case 13:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            echo "Enter the nationality: ".PHP_EOL;
+            $_nationality = $input->read();
+            echo "Enter the birthdate (YYYY-mm-dd): ".PHP_EOL;
+            $_birthdate = $input->read();
+            if ($_birthdate === "") {
+                throw new \Exception("birthdate cannot be empty");
+            }
+            $birthdate = new \DateTime($_birthdate);
+            try {
+                $author = new author($_name, $_nationality, $birthdate);
+                $authorRepository->insert($author);
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 14:
+            $authors = $authorRepository->getAllAuthors();
+            foreach ($authors as $author) {
+                echo "ID: {$author->get_id()} | {$author->get_name()} | {$author->get_nationality()} | {$author->get_birthdate()->format('Y-m-d')}".PHP_EOL;}
+            break;
+        case 15:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            if ($_name === "") {
+                throw new \Exception("name cannot be empty");
+            }
+            $foundAuthors = $authorRepository->findAuthorByName($_name);
+            foreach ($foundAuthors as $author) {
+                echo "ID: {$author->get_id()} | {$author->get_name()} | {$author->get_nationality()} | {$author->get_birthdate()->format('Y-m-d')}".PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            if (ctype_digit($_id)) {
+                $id = (int) $_id;
+            }
+            else {
+                throw new \Exception("please enter a valid number");
+            }
+            try {
+                foreach ($foundAuthors as $author) {
+                    if ($author->get_id() === $id) {
+                        $authorRepository->delete($author);
+                    }
+                }
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 16:
+            echo "Enter the name: ".PHP_EOL;
+            $_name = $input->read();
+            if ($_name === "") {
+                throw new \Exception("name cannot be empty");
+            }
+            $foundAuthors = $authorRepository->findAuthorByName($_name);
+            foreach ($foundAuthors as $author) {
+                echo
+                "ID: {$author->get_id()} | ".
+                "{$author->get_name()} | ".
+                "{$author->get_nationality()} | ".
+                "{$author->get_birthdate()->format('Y-m-d')}".
+                PHP_EOL;
+            }
+            echo "Enter id: ".PHP_EOL;
+            $_id = $input->read();
+            if (ctype_digit($_id)) {
+                $id = (int) $_id;
+            }
+            else {
+                throw new \Exception("please enter a valid number");
+            }
+            try {
+                $found = false;
+                foreach ($foundAuthors as $author) {
+                    if ($author->get_id() === $id) {
+                        while (true) {
+                            $found = true;
+                            echo "What do you want to do?".PHP_EOL;
+                            echo "1) Change name".PHP_EOL;
+                            echo "2) Change nationality".PHP_EOL;
+                            echo "3) Change birthdate".PHP_EOL;
+                            echo "4) Nothing".PHP_EOL;
+                            $_opcion = $input->read();
+                            switch ($_opcion) {
+                                case 1:
+                                    echo "New name: ".PHP_EOL;
+                                    $_name = $input->read();
+                                    $author->set_name($_name);
+                                    break;
+                                case 2:
+                                    echo "New nationality: ".PHP_EOL;
+                                    $_nationality = $input->read();
+                                    $author->set_nationality($_nationality);
+                                    break;
+                                case 3:
+                                    echo "New birthdate: ".PHP_EOL;
+                                    $_birthdate = $input->read();
+                                    $birthdate = new \DateTime($_birthdate);
+                                    $author->set_birthdate($birthdate);
+                                    break;
+                                case 4:
+                                    break(2);
+                                default:
+                                    echo "please enter a valid number".PHP_EOL;
+                                    break;
+                            }
+                        }
+                        $authorRepository->update($author);
+                    }
+                }
+                if (!$found) {
+                    echo "author not found".PHP_EOL;
+                }
+            }
+            catch(\Exception $e) {
+                echo "something failed: {$e->getMessage()}".PHP_EOL;
+            }
+            break;
+        case 17:
             exit(0);
         default:
             echo "please enter a valid number".PHP_EOL;
