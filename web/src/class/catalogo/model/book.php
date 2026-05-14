@@ -1,8 +1,9 @@
 <?php
+namespace catalogo\model;
 
-namespace model;
+use database\model;
 
-class book {
+class book implements model {
 
     //------------------------------------------------------------------
     public function get_tablename() : string {
