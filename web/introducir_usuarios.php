@@ -10,6 +10,13 @@ use \resena\database\user_repository;
 use \resena\model\user;
 
 require_once("src/autoload.php");
+require_once("auth.php");
+
+require_login();
+
+if (!is_admin()) {
+    die('Acceso denegado');
+}
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
@@ -17,20 +24,31 @@ $database_connection = $pdo_factory->create($config_factory->create_production()
 
 $user_repository = new user_repository($database_connection);
 
-$form_users = new form_users();
+$insert_result = null;
+if (array_key_exists("insercion", $_GET)) {
+    $insert_result = $_GET["insercion"];
+}
+
+$user = null;
+
+$form_users = new form_users($user, $insert_result);
 $view = new html_view();
 echo $view->create($form_users);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['nombre'])) {
-    $nombre = trim($_GET['nombre']);
-    $fecha = new DateTime($_GET['fecha']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
+    $nombre = trim($_POST['nombre']);
+    $fecha = new DateTime($_POST['fecha']);
+    $password = trim($_POST['password']);
+    $role = trim($_POST['role']);
+
     $user = new user(
         $nombre,
-        $fecha
+        $fecha,
+        $password,
+        $role
     );
-    $user_repository->insert($user);
 
-    echo "Usuario añadido correctamente";
+    $user_repository->insert($user);
 }
 
 exit(0);

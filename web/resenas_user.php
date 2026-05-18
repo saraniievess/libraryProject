@@ -13,6 +13,9 @@ use \view\html_view;
 use \view\review_list_name;
 
 require_once("src/autoload.php");
+require_once("auth.php");
+
+require_login();
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();

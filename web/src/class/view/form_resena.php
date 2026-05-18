@@ -12,7 +12,7 @@ class form_resena implements app_view_interface
     public function get_main_view(): string
     {
         return <<<R
-        <form>
+        <form action="introducir_resenas.php" method="POST">
             <label for="titulo">Título:</label><br>
             <input type="text" id="titulo" name="titulo" required><br>
             <label for="usuario">Usuario:</label><br>

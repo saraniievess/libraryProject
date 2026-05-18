@@ -10,6 +10,13 @@ use \catalogo\database\book_repository;
 use \catalogo\model\book;
 
 require_once("src/autoload.php");
+require_once("auth.php");
+
+require_login();
+
+if (!is_admin()) {
+    die('Acceso denegado');
+}
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
@@ -21,13 +28,13 @@ $form_libro = new form_libro();
 $view = new html_view();
 echo $view->create($form_libro);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['titulo'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['titulo'])) {
 
-    $titulo = trim($_GET['titulo']);
-    $autor = trim($_GET['autor']);
-    $editorial = trim($_GET['editorial']);
-    $genero = trim($_GET['genero']);
-    $pag_total = (int)$_GET['pag_total'];
+    $titulo = trim($_POST['titulo']);
+    $autor = trim($_POST['autor']);
+    $editorial = trim($_POST['editorial']);
+    $genero = trim($_POST['genero']);
+    $pag_total = (int)$_POST['pag_total'];
 
     $book = new book(
         $autor,

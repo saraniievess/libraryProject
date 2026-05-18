@@ -1,3 +1,10 @@
+<?php
+
+require_once("auth.php");
+
+require_login();
+
+echo <<<R
 <!DOCTYPE html>
 <html lang="es">
 
@@ -15,3 +22,4 @@
 </body>
 
 </html>
+R;

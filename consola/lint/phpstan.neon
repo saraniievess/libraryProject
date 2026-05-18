@@ -1,9 +1,0 @@
-parameters:
-	rememberPossiblyImpureFunctionValues: false
-	excludePaths:
-		analyse:
-			- ../tests
-	level: 7
-	paths:
-		- ../
-

@@ -10,6 +10,13 @@ use \resena\database\review_repository;
 use \resena\model\review;
 
 require_once("src/autoload.php");
+require_once("auth.php");
+
+require_login();
+
+if (!can_add_reviews()) {
+    die('Acceso denegado');
+}
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
@@ -21,12 +28,12 @@ $form_resena = new form_resena();
 $view = new html_view();
 echo $view->create($form_resena);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['titulo'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['titulo'])) {
     $titulo = trim($_GET['titulo']);
-    $usuario = trim($_GET['usuario']);
-    $fecha = new DateTime($_GET['fecha']);
-    $ranking = (int)$_GET['ranking'];
-    $info = trim($_GET['info']);
+    $usuario = trim($_POST['usuario']);
+    $fecha = new DateTime($_POST['fecha']);
+    $ranking = (int)$_POST['ranking'];
+    $info = trim($_POST['info']);
 
     $review = new review(
         $titulo,

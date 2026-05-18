@@ -38,7 +38,7 @@ class book_list_view implements app_view_interface
 	<ul>
 		{$view_list}
 	</ul>
-	<a href="index.html">Volver</a>
+	<a href="menu.html">Volver</a>
 	R;
 	}
 }

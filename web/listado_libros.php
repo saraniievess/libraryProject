@@ -10,6 +10,9 @@ use \view\html_view;
 use \view\book_list_view;
 
 require_once("src/autoload.php");
+require_once("auth.php");
+
+require_login();
 
 //Setup
 $config_factory = new config_factory();

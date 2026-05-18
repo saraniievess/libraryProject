@@ -34,7 +34,9 @@ class user_repository extends repository
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $user = new user(
                 $row['name'],
-                new \DateTime($row['date_birthday'])
+                new \DateTime($row['date_birthday']),
+                $row['password'],
+                $row['role']
             );
             $user->set_id((int)$row['id']);
             $users[] = $user;
@@ -60,7 +62,9 @@ class user_repository extends repository
         foreach ($rows as $row) {
             $user = new user(
                 $row['name'],
-                new \DateTime($row['date_birthday'])
+                new \DateTime($row['date_birthday']),
+                $row['password'],
+                $row['role']
             );
             $user->set_id((int)$row['id']);
             $users[] = $user;
@@ -69,7 +73,29 @@ class user_repository extends repository
         return $users;
     }
 
-    public function findUserById(int $id): user
+    public function findExactUserByName(string $name): ?user
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT * FROM {$this->table} WHERE name = :name"
+        );
+        $statement->execute([
+            ":name" => $name
+        ]);
+        $row = $statement->fetch();
+        if ($row === false) {
+            return null;
+        }
+        $user = new user(
+            $row['name'],
+            new \DateTime($row['date_birthday']),
+            $row['password'],
+            $row['role']
+        );
+        $user->set_id((int)$row['id']);
+        return $user;
+    }
+
+    public function findUserById(int $id): ?user
     {
         if ($this->findUsersByIdStatement === null) {
             $this->findUsersByIdStatement = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE id = :id");
@@ -82,12 +108,14 @@ class user_repository extends repository
         $row = $this->findUsersByIdStatement->fetch(\PDO::FETCH_ASSOC);
 
         if ($row === false) {
-            throw new \Exception("book not found");
+            return null;
         }
 
         $user = new user(
             $row['name'],
-            new \DateTime($row['date_birthday'])
+            new \DateTime($row['date_birthday']),
+            $row['password'],
+            $row['role']
         );
         $user->set_id((int)$row['id']);
 
