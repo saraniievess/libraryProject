@@ -73,7 +73,7 @@ class form_users implements app_view_interface
                 <button type="submit">$button_text</button>
             </form>
             <br>
-            <a href="index.html">Inicio</a>
+            <a href="menu.php">Inicio</a>
             HTML;
     }
 }

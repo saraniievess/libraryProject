@@ -17,7 +17,7 @@ require_once("auth.php");
 
 require_login();
 
-$user_id = $_POST["user_id"] ?? 0;
+$user_id = $_GET["user_id"] ?? 0;
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();

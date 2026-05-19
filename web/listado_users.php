@@ -24,7 +24,7 @@ $user_repo = new user_repository($database_connection);
 $users = $user_repo->getAllUsers();
 
 //Setup view.
-$user_list_view = new user_list_view($users);
+$user_list_view = new user_list_view($users, get_logged_user());
 $view = new html_view();
 echo $view->create($user_list_view);
 exit(0);

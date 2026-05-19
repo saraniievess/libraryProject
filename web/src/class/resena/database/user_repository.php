@@ -76,7 +76,7 @@ class user_repository extends repository
     public function findExactUserByName(string $name): ?user
     {
         $statement = $this->pdo->prepare(
-            "SELECT * FROM {$this->table} WHERE name = :name"
+            "SELECT * FROM {$this->table} WHERE LOWER(name) = LOWER(:name)"
         );
         $statement->execute([
             ":name" => $name

@@ -36,14 +36,35 @@ if (
     && isset($_POST['password'])
 ) {
     $name = trim($_POST['name']);
-    $password = trim($_POST['password']);
+    $password = $_POST['password'];
     $user = $user_repository->findExactUserByName($name);
     if (
         $user !== null
-        && $user->get_password() === $password
+        && password_verify(
+            $password,
+            $user->get_password()
+        )
     ) {
-        $_SESSION['role'] = $user->get_role();
-        $_SESSION['username'] = $user->get_name();
+        $_SESSION['logged_in_user_id'] = $user->get_id();
+        $statement = $database_connection->prepare(
+            "INSERT INTO sessions (
+                session_hash,
+                user_id,
+                created_at,
+                last_activity
+            ) VALUES (
+                :session_hash,
+                :user_id,
+                NOW(),
+                NOW()
+            )"
+        );
+
+        $statement->execute([
+            ":session_hash" => session_id(),
+            ":user_id" => $user->get_id()
+        ]);
+        unset($_SESSION['is_visitor']);
         header('Location: menu.php');
         exit(0);
     } else {
@@ -53,12 +74,14 @@ if (
 
 if (isset($_POST['visitor'])) {
 
-    $_SESSION['role'] = 'visitor';
-    $_SESSION['username'] = 'Visitante';
+    $_SESSION['is_visitor'] = true;
+
+    unset($_SESSION['logged_in_user_id']);
 
     header('Location: menu.php');
     exit(0);
 }
+
 
 echo <<<R
 <!DOCTYPE html>
@@ -69,7 +92,7 @@ echo <<<R
 </head>
 <body>
 <h1>Iniciar sesión</h1>
-<p>$error</p>
+<p>{$error}</p>
 <form method="POST">
     <label for="name">Nombre:</label>
     <input type="text" name="name" id="name">

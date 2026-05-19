@@ -39,12 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
     $nombre = trim($_POST['nombre']);
     $fecha = new DateTime($_POST['fecha']);
     $password = trim($_POST['password']);
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
     $role = trim($_POST['role']);
 
     $user = new user(
         $nombre,
         $fecha,
-        $password,
+        $password_hash,
         $role
     );
 
