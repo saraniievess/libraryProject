@@ -36,7 +36,7 @@ if (
     && isset($_POST['password'])
 ) {
     $name = trim($_POST['name']);
-    $password = $_POST['password'];
+    $password = trim($_POST['password']);
     $user = $user_repository->findExactUserByName($name);
     if (
         $user !== null

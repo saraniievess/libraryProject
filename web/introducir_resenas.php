@@ -14,6 +14,11 @@ require_once("auth.php");
 
 require_login();
 
+if (is_visitor()) {
+    header('Location: index.php');
+    exit(0);
+}
+
 if (!can_add_reviews()) {
     die('Acceso denegado');
 }

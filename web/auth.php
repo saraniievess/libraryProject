@@ -10,73 +10,52 @@ use \app\config_factory;
 use \app\pdo_factory;
 use \resena\database\user_repository;
 use \resena\model\user;
+use \session\session_manager;
 
-function get_logged_user(): ?user
+function get_session_manager(): session_manager
 {
-    if (!isset($_SESSION['logged_in_user_id'])) {
-        return null;
-    }
     $config_factory = new config_factory();
     $pdo_factory = new pdo_factory();
     $database_connection = $pdo_factory->create(
         $config_factory->create_production()
     );
-    $user_repository = new user_repository(
-        $database_connection
+    return new session_manager(
+        $database_connection,
+        session_id()
     );
-    return $user_repository->findUserById(
-        (int)$_SESSION['logged_in_user_id']
-    );
+}
+
+function get_logged_user(): ?user
+{
+    return get_session_manager()->get_logged_in_user();
 }
 
 function require_login(): void
 {
+    $session_manager = get_session_manager();
     if (
-        !isset($_SESSION['logged_in_user_id'])
-        && !isset($_SESSION['is_visitor'])
+        !$session_manager->is_user_logged_in()
+        && !is_visitor()
     ) {
         header('Location: index.php');
         exit(0);
     }
-
-    $_SESSION['last_activity'] = time();
-    if (isset($_SESSION['logged_in_user_id'])) {
-        $config_factory = new config_factory();
-        $pdo_factory = new pdo_factory();
-        $database_connection = $pdo_factory->create(
-            $config_factory->create_production()
-        );
-        $statement = $database_connection->prepare(
-            "UPDATE sessions
-            SET last_activity = NOW()
-            WHERE session_hash = :session_hash"
-        );
-        $statement->execute([
-            ":session_hash" => session_id()
-        ]);
-    }
-}
-
-function is_admin(): bool
-{
-    $user = get_logged_user();
-
-    return $user !== null
-        && $user->get_role() === 'admin';
-}
-
-function is_user(): bool
-{
-    $user = get_logged_user();
-
-    return $user !== null
-        && $user->get_role() === 'user';
+    $session_manager->commit_last_activity();
 }
 
 function is_visitor(): bool
 {
-    return isset($_SESSION['is_visitor'])
-        && $_SESSION['is_visitor'] === true;
+    return get_session_manager()->is_visitor();
+}
+
+function is_admin(): bool
+{
+    return get_session_manager()->is_admin();
+}
+
+function is_user(): bool
+{
+    return get_session_manager()->is_user();
 }
 
 function can_add_reviews(): bool
@@ -97,4 +76,9 @@ function can_edit_user(string $username): bool
     $user = get_logged_user();
     return $user !== null
         && $user->get_name() === $username;
+}
+
+function logout(): void
+{
+    get_session_manager()->logout();
 }
