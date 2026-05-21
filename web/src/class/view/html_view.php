@@ -18,6 +18,7 @@ class html_view
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<link rel="icon" type="image/png" href="/home/sara/sara/libraryProject/web/img/logo.png">
 				<title>{$title}</title>
 			</head>
 			<body>

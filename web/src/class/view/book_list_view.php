@@ -26,7 +26,7 @@ class book_list_view implements app_view_interface
 		$view_list = "";
 		foreach ($this->books as $book) {
 
-			$review_uri = "resenas_libro.php?book_id={$book->get_id()}";
+			$review_uri = "resenas_libro.php?title={$book->get_title()}";
 			$view_list .= <<<R
 
 		<li> ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()} <a href="{$review_uri}">Reseñas</a></li>

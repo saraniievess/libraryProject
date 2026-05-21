@@ -2,7 +2,8 @@
 
 namespace database;
 
-class repository {
+class repository
+{
     private \PDO $pdo;
 
     /**
@@ -21,20 +22,25 @@ class repository {
     private array $deleteStatements = [];
 
 
-    public function __construct(\PDO $_pdo) {
+    public function __construct(\PDO $_pdo)
+    {
         $this->pdo = $_pdo;
     }
 
 
-    public function insert(model $model) : void {
+    public function insert(model $model): void
+    {
         $tablename = $model->get_tablename();
 
-        if ($this->insertStatements[$tablename] === null) {
-            $field_list=implode(",",$model->get_field_list());
-            $field_values_list=array_map(
-                function (string $_val) {return ":{$_val}";}, $model->get_field_list()
+        if (!isset($this->insertStatements[$tablename])) {
+            $field_list = implode(",", $model->get_field_list());
+            $field_values_list = array_map(
+                function (string $_val) {
+                    return ":{$_val}";
+                },
+                $model->get_field_list()
             );
-            $field_values=implode(",",$field_values_list);
+            $field_values = implode(",", $field_values_list);
             $statement = $this->pdo->prepare("INSERT INTO {$tablename} ({$field_list}) VALUES ({$field_values})");
             if ($statement === false) {
                 throw new \Exception("database prepare failed");
@@ -47,12 +53,16 @@ class repository {
         $model->set_id($id);
     }
 
-    public function update(model $model) : void {
+    public function update(model $model): void
+    {
         $tablename = $model->get_tablename();
 
-        if ($this->updateStatements[$tablename] === null) {
-            $field_list=array_map(
-                function (string $_val) {return "{$_val} = :{$_val}";}, $model->get_field_list()
+        if (!isset($this->updateStatements[$tablename])) {
+            $field_list = array_map(
+                function (string $_val) {
+                    return "{$_val} = :{$_val}";
+                },
+                $model->get_field_list()
             );
             $fields = implode(",", $field_list);
             $statement = $this->pdo->prepare("UPDATE {$tablename} SET {$fields} WHERE id = :id");
@@ -66,14 +76,15 @@ class repository {
         $this->updateStatements[$tablename]->execute($statement_args);
     }
 
-    public function delete(model $model) : void {
+    public function delete(model $model): void
+    {
         $tablename = $model->get_tablename();
 
-        if ($this->deleteStatements[$tablename] === null) {
+        if (!isset($this->deleteStatements[$tablename])) {
             $statement = $this->pdo->prepare(
                 "DELETE FROM {$tablename} WHERE id = :id"
             );
-                if ($statement === false) {
+            if ($statement === false) {
                 throw new \Exception("database prepare failed");
             }
             $this->deleteStatements[$tablename] = $statement;

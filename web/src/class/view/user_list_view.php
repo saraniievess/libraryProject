@@ -8,26 +8,26 @@ class user_list_view implements app_view_interface
 {
 
     /**
-     *@param list<user> $users
+     * @param list<user> $users
      */
     public function __construct(
         private array $users,
-        private ?\resena\model\user $logged_user
+        private ?user $logged_user
     ) {}
 
     public function get_title(): string
     {
-
         return "Listado de usuarios";
     }
 
     public function get_main_view(): string
     {
-
         $view_list = "";
         foreach ($this->users as $user) {
-
-            $review_uri = "resenas_user.php?user_id={$user->get_id()}";
+            $review_uri =
+                "resenas_user.php?username={$user->get_name()}";
+            $edit_form = "";
+            $delete_button = "";
             $can_edit = false;
             if ($this->logged_user !== null) {
                 if (
@@ -37,27 +37,46 @@ class user_list_view implements app_view_interface
                     $can_edit = true;
                 }
             }
+
+            if (
+                $this->logged_user !== null
+                && $this->logged_user->get_role() === 'admin'
+            ) {
+                $delete_button = <<<R
+                <button type="button" onclick="confirm_deletion({$user->get_id()})">Borrar</button>
+                R;
+            }
+
             if ($can_edit) {
                 $edit_form = <<<R
-                <a href="editar_usuario.php?user_id={$user->get_id()}">
-                    Modificar
-                </a>
+                <a href="editar_usuario.php?user_id={$user->get_id()}">Modificar</a>
                 R;
             }
 
             $view_list .= <<<R
-                <li> 
-                    ID: {$user->get_id()} | {$user->get_name()} | {$user->get_birthdate()->format("d-m-Y")} 
+                <li>
+                    ID: {$user->get_id()} | {$user->get_name()} | {$user->get_birthdate()->format("d-m-Y")}
+                    {$delete_button}
                     {$edit_form}
                     <a href="{$review_uri}">Reseñas</a>
                 </li>
             R;
         }
+
         return <<<R
-	<ul>
-		{$view_list}
-	</ul>
-	<a href="menu.php">Volver</a>
-	R;
+        <ul>
+            {$view_list}
+        </ul>
+        <a href="menu.php">Volver</a>
+
+        <script>
+        function confirm_deletion(user_id) {
+            if (!confirm("¿Deseas borrar al usuario?")) {
+                return;
+            }
+            window.location.href ="borrar_usuario.php?user_id=" + user_id;
+        }
+        </script>
+        R;
     }
 }

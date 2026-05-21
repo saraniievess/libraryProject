@@ -2,9 +2,20 @@
 
 declare(strict_types=1);
 
-require_once("auth.php");
+session_start();
 
-logout();
+use \app\config_factory;
+use \app\pdo_factory;
+use \session\session_manager;
+
+require_once("src/autoload.php");
+
+$config_factory = new config_factory();
+$pdo_factory = new pdo_factory();
+$database_connection = $pdo_factory->create($config_factory->create_production());
+$session_manager = new session_manager($database_connection, session_id());
+
+$session_manager->logout();
 
 header('Location: index.php');
 

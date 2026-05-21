@@ -21,22 +21,25 @@ $_SESSION['last_activity'] = time();
 use \app\config_factory;
 use \app\pdo_factory;
 use \resena\database\user_repository;
+use \session\session_manager;
 
 require_once("src/autoload.php");
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
 $database_connection = $pdo_factory->create($config_factory->create_production());
+$session_manager = new session_manager($database_connection, session_id());
 $user_repository = new user_repository($database_connection);
 
 $error = "";
+
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST'
     && isset($_POST['name'])
     && isset($_POST['password'])
 ) {
     $name = trim($_POST['name']);
-    $password = trim($_POST['password']);
+    $password = $_POST['password'];
     $user = $user_repository->findExactUserByName($name);
     if (
         $user !== null
@@ -45,7 +48,8 @@ if (
             $user->get_password()
         )
     ) {
-        $_SESSION['logged_in_user_id'] = $user->get_id();
+        $_SESSION['is_visitor'] = false;
+        $_SESSION['last_activity'] = time();
         $statement = $database_connection->prepare(
             "INSERT INTO sessions (
                 session_hash,
@@ -59,12 +63,10 @@ if (
                 NOW()
             )"
         );
-
         $statement->execute([
             ":session_hash" => session_id(),
             ":user_id" => $user->get_id()
         ]);
-        unset($_SESSION['is_visitor']);
         header('Location: menu.php');
         exit(0);
     } else {
@@ -73,15 +75,10 @@ if (
 }
 
 if (isset($_POST['visitor'])) {
-
     $_SESSION['is_visitor'] = true;
-
-    unset($_SESSION['logged_in_user_id']);
-
     header('Location: menu.php');
     exit(0);
 }
-
 
 echo <<<R
 <!DOCTYPE html>
@@ -91,24 +88,22 @@ echo <<<R
     <title>Login</title>
 </head>
 <body>
+
 <h1>Iniciar sesión</h1>
+
 <p>{$error}</p>
 <form method="POST">
     <label for="name">Nombre:</label>
     <input type="text" name="name" id="name">
-    <br><br>
+    <br>
     <label for="password">Contraseña:</label>
     <input type="password" name="password" id="password">
-    <br><br>
-    <button type="submit">
-        Iniciar sesión
-    </button>
+    <br>
+    <button type="submit">Iniciar sesión</button>
 </form>
 <br>
 <form method="POST">
-    <button type="submit" name="visitor">
-        Continuar como visitante
-    </button>
+    <button type="submit" name="visitor">Continuar como visitante</button>
 </form>
 </body>
 </html>

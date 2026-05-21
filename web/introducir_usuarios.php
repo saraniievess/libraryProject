@@ -2,54 +2,63 @@
 
 declare(strict_types=1);
 
+session_start();
+
 use \app\config_factory;
 use \app\pdo_factory;
 use \view\html_view;
 use \view\form_users;
 use \resena\database\user_repository;
 use \resena\model\user;
+use \session\session_manager;
 
 require_once("src/autoload.php");
-require_once("auth.php");
-
-require_login();
-
-if (!is_admin()) {
-    die('Acceso denegado');
-}
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
 $database_connection = $pdo_factory->create($config_factory->create_production());
+$session_manager = new session_manager($database_connection, session_id());
+$current_user = $session_manager->get_logged_in_user();
+$session_manager->commit_last_activity();
+
+// Login
+if (null === $current_user) {
+    header('Location: index.php');
+    exit(0);
+}
+
+// Admin
+if ($current_user->get_role() !== 'admin') {
+    die("No tienes permisos para esto");
+}
 
 $user_repository = new user_repository($database_connection);
 
-$insert_result = null;
-if (array_key_exists("insercion", $_GET)) {
-    $insert_result = $_GET["insercion"];
-}
-
-$user = null;
-
-$form_users = new form_users($user, $insert_result);
-$view = new html_view();
-echo $view->create($form_users);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['nombre'])
+) {
     $nombre = trim($_POST['nombre']);
-    $fecha = new DateTime($_POST['fecha']);
-    $password = trim($_POST['password']);
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    $birthdate = new \DateTime(
+        $_POST['fecha']
+    );
+    $password = password_hash(
+        $_POST['password'],
+        PASSWORD_DEFAULT
+    );
     $role = trim($_POST['role']);
-
     $user = new user(
         $nombre,
-        $fecha,
-        $password_hash,
+        $birthdate,
+        $password,
         $role
     );
-
     $user_repository->insert($user);
+    echo "Usuario añadido correctamente";
 }
+
+$form_users = new form_users(null, null);
+$view = new html_view();
+echo $view->create($form_users);
 
 exit(0);

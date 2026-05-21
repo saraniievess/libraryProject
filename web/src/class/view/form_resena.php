@@ -20,11 +20,11 @@ class form_resena implements app_view_interface
             <label for="ranking">Puntuación:</label>
             <select name="ranking" id="ranking">
                 <option value="">--Elige--</option>
-                <option value=1>1</option>
-                <option value=1>2</option>
-                <option value=2>3</option>
-                <option value=4>4</option>
-                <option value=5>5</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
             </select><br>
             <label for="fecha">Fecha de finalización:</label>
             <input type="date" id="fecha" name="fecha" required><br>

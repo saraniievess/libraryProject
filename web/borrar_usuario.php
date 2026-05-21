@@ -6,9 +6,7 @@ session_start();
 
 use \app\config_factory;
 use \app\pdo_factory;
-use \resena\database\review_repository;
-use \view\html_view;
-use \view\review_list_title;
+use \resena\database\user_repository;
 use \session\session_manager;
 
 require_once("src/autoload.php");
@@ -20,23 +18,25 @@ $session_manager = new session_manager($database_connection, session_id());
 $current_user = $session_manager->get_logged_in_user();
 $session_manager->commit_last_activity();
 
-// Login
+// Admin
 if (
-	null === $current_user
-	&& !$session_manager->is_visitor()
+    null === $current_user
+    || $current_user->get_role() !== 'admin'
 ) {
-	header('Location: index.php');
-	exit(0);
+    die("No tienes permisos");
 }
 
-$title = $_GET['title'] ?? '';
+$user_id = (int)($_GET['user_id'] ?? 0);
 
-$review_repository = new review_repository($database_connection);
+$user_repository = new user_repository($database_connection);
 
-$reviews = $review_repository->findReviewByTitle($title);
+$user = $user_repository->findUserById($user_id);
 
-$review_list_title = new review_list_title($reviews, $title);
-$view = new html_view();
-echo $view->create($review_list_title);
+if (null === $user) {
+    die("Usuario no encontrado");
+}
+
+$user_repository->delete($user);
+header('Location: listado_users.php');
 
 exit(0);
