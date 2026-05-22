@@ -6,13 +6,21 @@ use \resena\model\user;
 
 class form_users implements app_view_interface
 {
+    const origin_list_user = "list_user";
+    const origin_new_user = "new_user";
 
     private ?string $insertion_result;
     private ?user $user;
+    private string $origin;
 
-    public function __construct(?user $user, ?string $_insertion_result)
-    {
+    public function __construct(
+        ?user $user,
+        string $_origin,
+        ?string $_insertion_result
+    ) {
+
         $this->user = $user;
+        $this->origin = $_origin;
         $this->insertion_result = $_insertion_result;
     }
 
@@ -51,7 +59,19 @@ class form_users implements app_view_interface
 
         $action = $this->user === null
             ? "introducir_usuarios.php"
-            : "modificar_users.php";
+            : "backend/modificar_users.php";
+
+        switch ($this->origin) {
+
+            case self::origin_new_user:
+                $back_uri = "menu_form.php";
+                break;
+            case self::origin_list_user:
+                $back_uri = "listado_users.php";
+            default:
+                //NOOP
+                break;
+        }
 
         return <<<HTML
             $view_insertion_result
@@ -73,7 +93,7 @@ class form_users implements app_view_interface
                 <button type="submit">$button_text</button>
             </form>
             <br>
-            <a href="menu.php">Inicio</a>
-            HTML;
+            <a href="{$back_uri}">Volver</a>
+HTML;
     }
 }

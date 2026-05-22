@@ -5,5 +5,5 @@ function confirm_deletion(user_id) {
     }
 
     window.location.href =
-        "borrar_usuario.php?user_id=" + user_id;
+        "backend/borrar_usuario.php?user_id=" + user_id;
 }

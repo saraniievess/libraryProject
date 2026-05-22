@@ -26,7 +26,7 @@ class form_libro implements app_view_interface
             <input type="submit" value="Añadir">
         </form>
         <br>
-        <a href="index_form.php">Volver</a><br>
+        <a href="menu_form.php">Volver</a><br>
         R;
     }
 }

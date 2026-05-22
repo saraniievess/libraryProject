@@ -2,9 +2,6 @@
 
 namespace view;
 
-ini_set('display_errors', '1');
-ini_set('error_reporting', '-1');
-
 use \resena\model\review;
 
 class review_list_title implements app_view_interface

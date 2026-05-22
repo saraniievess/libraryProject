@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace backend;
+
 session_start();
 
 use \app\config_factory;
@@ -9,7 +11,7 @@ use \app\pdo_factory;
 use \resena\database\user_repository;
 use \session\session_manager;
 
-require_once("src/autoload.php");
+require_once("../src/autoload.php");
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();
@@ -37,6 +39,6 @@ if (null === $user) {
 }
 
 $user_repository->delete($user);
-header('Location: listado_users.php');
+header('Location: ../listado_users.php');
 
 exit(0);

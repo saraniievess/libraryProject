@@ -67,16 +67,9 @@ class user_list_view implements app_view_interface
         <ul>
             {$view_list}
         </ul>
+        <script type="text/javascript" src="assets/js/delete_user.js"></script>
         <a href="menu.php">Volver</a>
 
-        <script>
-        function confirm_deletion(user_id) {
-            if (!confirm("¿Deseas borrar al usuario?")) {
-                return;
-            }
-            window.location.href ="borrar_usuario.php?user_id=" + user_id;
-        }
-        </script>
-        R;
+R;
     }
 }

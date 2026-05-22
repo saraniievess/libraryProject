@@ -57,7 +57,19 @@ if (
     echo "Usuario añadido correctamente";
 }
 
-$form_users = new form_users(null, null);
+//The presence or absence of "origin" in the query string...
+$origin = form_users::origin_new_user;
+if (array_key_exists("origin", $_GET)) {
+
+    //...may cause the return path to be different.
+    switch ($_GET["origin"]) {
+        case form_users::origin_new_user:
+            $origin = $_GET["origin"];
+            break;
+    }
+}
+
+$form_users = new form_users(null, $origin, null);
 $view = new html_view();
 echo $view->create($form_users);
 

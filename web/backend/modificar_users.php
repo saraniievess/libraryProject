@@ -10,7 +10,7 @@ use \resena\database\user_repository;
 use \resena\model\user;
 use \session\session_manager;
 
-require_once("src/autoload.php");
+require_once("../src/autoload.php");
 
 $config_factory = new config_factory();
 $pdo_factory = new pdo_factory();

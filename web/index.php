@@ -4,24 +4,12 @@ declare(strict_types=1);
 
 session_start();
 
-$timeout = 600;
-
-if (
-    isset($_SESSION['last_activity'])
-    && (time() - $_SESSION['last_activity']) > $timeout
-) {
-    session_unset();
-    session_destroy();
-    header('Location: index.php');
-    exit(0);
-}
-
-$_SESSION['last_activity'] = time();
-
 use \app\config_factory;
 use \app\pdo_factory;
 use \resena\database\user_repository;
 use \session\session_manager;
+use \view\html_view;
+use \view\login_view;
 
 require_once("src/autoload.php");
 
@@ -30,6 +18,7 @@ $pdo_factory = new pdo_factory();
 $database_connection = $pdo_factory->create($config_factory->create_production());
 $session_manager = new session_manager($database_connection, session_id());
 $user_repository = new user_repository($database_connection);
+$session_manager->commit_last_activity();
 
 $error = "";
 
@@ -80,31 +69,6 @@ if (isset($_POST['visitor'])) {
     exit(0);
 }
 
-echo <<<R
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
-
-<h1>Iniciar sesión</h1>
-
-<p>{$error}</p>
-<form method="POST">
-    <label for="name">Nombre:</label>
-    <input type="text" name="name" id="name">
-    <br>
-    <label for="password">Contraseña:</label>
-    <input type="password" name="password" id="password">
-    <br>
-    <button type="submit">Iniciar sesión</button>
-</form>
-<br>
-<form method="POST">
-    <button type="submit" name="visitor">Continuar como visitante</button>
-</form>
-</body>
-</html>
-R;
+$login_view = new login_view($error);
+$view = new html_view();
+echo $view->create($login_view);
