@@ -5,7 +5,7 @@ namespace view;
 class html_view
 {
 
-	public function create(app_view_interface $_view)
+	public function create(app_view_interface $_view): string
 	{
 
 		$title = $_view->get_title();

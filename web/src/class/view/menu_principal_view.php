@@ -2,7 +2,6 @@
 
 namespace view;
 
-use \resena\model\review;
 use \session\session_manager;
 
 class menu_principal_view implements app_view_interface
@@ -25,7 +24,7 @@ class menu_principal_view implements app_view_interface
             R;
         } else {
             $session_link = <<<R
-            <a href="logout.php">Cerrar sesión</a>
+            <a href="backend/logout.php">Cerrar sesión</a>
             R;
         }
         return <<<R

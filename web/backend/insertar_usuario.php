@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace backend;
-
 session_start();
 
 use \app\config_factory;
 use \app\pdo_factory;
 use \resena\database\user_repository;
+use \resena\model\user;
 use \session\session_manager;
 
 require_once("../src/autoload.php");
@@ -25,26 +24,33 @@ $session_manager = new session_manager($database_connection, $session_id);
 $session_manager->commit_last_activity();
 $current_user = $session_manager->get_logged_in_user();
 
+// Login
+if ($current_user === null) {
+    header('Location: ../index.php');
+    exit(0);
+}
 
 // Admin
-if (
-    null === $current_user
-    || $current_user->get_role() !== 'admin'
-) {
-    die("No tienes permisos");
+if ($current_user->get_role() !== 'admin') {
+    die("No tienes permisos para esto");
 }
 
-$user_id = (int)($_GET['user_id'] ?? 0);
+if (
+    $_SERVER['REQUEST_METHOD'] !== 'POST'
+    || !isset($_POST['nombre'])
+) {
+    header('Location: ../introducir_usuarios.php');
+    exit(0);
+}
 
 $user_repository = new user_repository($database_connection);
+$nombre = trim($_POST['nombre']);
+$birthdate = new \DateTime($_POST['fecha']);
+$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+$role = trim($_POST['role']);
+$user = new user($nombre, $birthdate, $password, $role);
+$user_repository->insert($user);
 
-$user = $user_repository->findUserById($user_id);
-
-if (null === $user) {
-    die("Usuario no encontrado");
-}
-
-$user_repository->delete($user);
-header('Location: ../listado_users.php');
+header("Location: ../introducir_usuarios.php?origin=new_user&insertion=ok");
 
 exit(0);

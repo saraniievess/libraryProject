@@ -81,6 +81,7 @@ class user implements model
     {
         return $this->password;
     }
+
     public function get_role(): string
     {
         return $this->role;
@@ -105,7 +106,7 @@ class user implements model
         $this->birthdate = $_birthdate;
     }
 
-    public function set_password(string $password)
+    public function set_password(string $password): void
     {
         $password = trim($password);
         if ($password === "") {
@@ -114,7 +115,7 @@ class user implements model
         $this->password = $password;
     }
 
-    public function set_role(string $role)
+    public function set_role(string $role): void
     {
         $role = trim($role);
         if ($role === "") {

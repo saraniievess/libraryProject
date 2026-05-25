@@ -52,7 +52,7 @@ class book_repository extends repository
 
 
     /**
-     * @return book[]
+     * @return list<book>
      */
     public function getAllBooks(): array
     {

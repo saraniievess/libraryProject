@@ -3,12 +3,10 @@
 namespace view;
 
 use \resena\model\user;
-use \session\session_manager;
 
 class menu_form_view implements app_view_interface
 {
     public function __construct(
-        private session_manager $session_manager,
         private ?user $current_user
     ) {}
 
@@ -41,6 +39,5 @@ R;
 R;
 
         return $view;
-        R;
     }
 }

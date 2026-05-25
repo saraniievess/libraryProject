@@ -19,7 +19,7 @@ class login_view implements app_view_interface
         $view = "";
         $view .= <<<R
         <p>{$this->error}</p>
-        <form method="POST">
+        <form action="backend/login.php" method="POST">
             <label for="name">Nombre:</label>
             <input type="text" name="name" id="name">
             <br>

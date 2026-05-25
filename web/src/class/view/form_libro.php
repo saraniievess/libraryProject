@@ -12,7 +12,7 @@ class form_libro implements app_view_interface
     public function get_main_view(): string
     {
         return <<<R
-        <form action="introducir_libros.php" method="POST">
+        <form action="backend/insertar_libro.php" method="POST">
             <label for="titulo">Título:</label><br>
             <input type="text" id="titulo" name="titulo" required><br>
             <label for="autor">Autor:</label><br>

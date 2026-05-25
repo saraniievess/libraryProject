@@ -39,11 +39,11 @@ class form_users implements app_view_interface
         if (null !== $this->insertion_result) {
             $view_insertion_result = "ok" === $this->insertion_result
                 ? <<< R
-            <p>Usuario anadido correctamente</p>
-            R
+                <p>Usuario anadido correctamente</p>
+                R
                 : <<< R
-            <p>Ha ocurrido un error al insertar el usuario</p>
-            R;
+                <p>Ha ocurrido un error al insertar el usuario</p>
+                R;
         }
         $name_value = null === $this->user
             ? ""
@@ -58,11 +58,11 @@ class form_users implements app_view_interface
             : "Modificar usuario";
 
         $action = $this->user === null
-            ? "introducir_usuarios.php"
+            ? "backend/insertar_usuario.php"
             : "backend/modificar_users.php";
 
+        $back_uri = "menu_form.php";
         switch ($this->origin) {
-
             case self::origin_new_user:
                 $back_uri = "menu_form.php";
                 break;
@@ -74,26 +74,26 @@ class form_users implements app_view_interface
         }
 
         return <<<HTML
-            $view_insertion_result
+                $view_insertion_result
 
-            <form action="$action" method="POST">
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" value="$name_value">
-                <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" name="fecha" value="$birthdate_value">
+                <form action="$action" method="POST">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="$name_value">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" value="$birthdate_value">
+                    <br>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password">
+                    <label for="role">Rol:</label>
+                    <select name="role" id="role">
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                    <input type="hidden" name="user_id" value="{$this->user?->get_id()}">
+                    <button type="submit">$button_text</button>
+                </form>
                 <br>
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password">
-                <label for="role">Rol:</label>
-                <select name="role" id="role">
-                    <option value="user">Usuario</option>
-                    <option value="admin">Administrador</option>
-                </select>
-                <input type="hidden" name="user_id" value="{$this->user?->get_id()}">
-                <button type="submit">$button_text</button>
-            </form>
-            <br>
-            <a href="{$back_uri}">Volver</a>
-HTML;
+                <a href="{$back_uri}">Volver</a>
+    HTML;
     }
 }

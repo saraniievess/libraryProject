@@ -21,7 +21,7 @@ class review_repository extends repository
 
 
     /**
-     * @return review[]
+     * @return list<review>
      */
     public function getAllReviews(): array
     {
@@ -45,7 +45,7 @@ class review_repository extends repository
     }
 
     /**
-     * @return review[]
+     * @return list<review>
      */
     public function findReviewByTitle(string $title): array
     {
@@ -74,7 +74,7 @@ class review_repository extends repository
     }
 
     /**
-     * @return review[]
+     * @return list<review>
      */
     public function findReviewByName(string $name): array
     {

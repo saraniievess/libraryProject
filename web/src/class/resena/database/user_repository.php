@@ -21,7 +21,7 @@ class user_repository extends repository
 
 
     /**
-     * @return user[]
+     * @return list<user>
      */
     public function getAllUsers(): array
     {
@@ -45,7 +45,7 @@ class user_repository extends repository
     }
 
     /**
-     * @return user[]
+     * @return list<user>
      */
     public function findUserByName(string $name): array
     {
