@@ -39,7 +39,7 @@ class form_users implements app_view_interface
         if (null !== $this->insertion_result) {
             $view_insertion_result = "ok" === $this->insertion_result
                 ? <<< R
-                <p>Usuario anadido correctamente</p>
+                <p>Usuario añadido correctamente</p>
                 R
                 : <<< R
                 <p>Ha ocurrido un error al insertar el usuario</p>
@@ -73,27 +73,40 @@ class form_users implements app_view_interface
                 break;
         }
 
-        return <<<HTML
-                $view_insertion_result
+        $user_id = null === $this->user
+            ? ""
+            : $this->user->get_id();
 
-                <form action="$action" method="POST">
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre" name="nombre" value="$name_value">
-                    <label for="fecha">Fecha:</label>
-                    <input type="date" id="fecha" name="fecha" value="$birthdate_value">
-                    <br>
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" name="password">
-                    <label for="role">Rol:</label>
-                    <select name="role" id="role">
-                        <option value="user">Usuario</option>
-                        <option value="admin">Administrador</option>
-                    </select>
-                    <input type="hidden" name="user_id" value="{$this->user?->get_id()}">
-                    <button type="submit">$button_text</button>
-                </form>
+        return <<<HTML
+		{$view_insertion_result}
+
+		<script type="text/javascript" src="assets/js/introducir_usuarios.js"></script>
+
+		<section id="form_user">
+			<form action="{$action}" method="POST">
+			<label for="nombre">Nombre:</label>
+			<input type="text" name="nombre" value="{$name_value}">
+			    <label for="fecha">Fecha:</label>
+			    <input type="date" name="fecha" value="{$birthdate_value}">
+			    <br>
+			    <label for="password">Contraseña:</label>
+			    <input type="password" name="password">
+			    <label for="role">Rol:</label>
+			    <select name="role">
+				    <option value="user">Usuario</option>
+				    <option value="admin">Administrador</option>
+			    </select>
+			    <input type="hidden" name="user_id" value="{$user_id}">
+			    <button type="button" data-role="send_btn">{$button_text}</button>
+			</form>
+
+			<!-- Here be errors -->
+			<ul></ul>
+
+		</section>
+
                 <br>
                 <a href="{$back_uri}">Volver</a>
-    HTML;
+HTML;
     }
 }

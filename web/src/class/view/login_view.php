@@ -29,7 +29,7 @@ class login_view implements app_view_interface
             <button type="submit">Iniciar sesión</button>
         </form>
         <br>
-        <form method="POST">
+        <form method="POST" action="menu.php">
             <button type="submit" name="visitor">Continuar como visitante</button>
         </form>
         </body>

@@ -53,9 +53,13 @@ $fecha = new \DateTime($_POST['fecha']);
 $ranking = (int) $_POST['ranking'];
 $info = trim($_POST['info']);
 
-$review = new review($titulo, $usuario, $ranking, $fecha, $info);
-$review_repository->insert($review);
-
-header('Location: ../introducir_resenas.php');
+try {
+    $review = new review($titulo, $usuario, $ranking, $fecha, $info);
+    $review_repository->insert($review);
+    header("Location: ../introducir_resenas.php?insertion=ok");
+} catch (\Throwable $e) {
+    error_log("something failed when inserting the review: {$e->getMessage()}");
+    header("Location: ../introducir_resenas.php?insertion=error");
+}
 
 exit(0);

@@ -51,9 +51,13 @@ $editorial = trim($_POST['editorial']);
 $genero = trim($_POST['genero']);
 $pag_total = (int) $_POST['pag_total'];
 
-$book = new book($autor, $titulo, $editorial, $genero, $pag_total);
-$book_repository->insert($book);
-
-header('Location: ../introducir_libros.php');
+try {
+    $book = new book($titulo, $autor, $editorial, $genero, $pag_total);
+    $book_repository->insert($book);
+    header("Location: ../introducir_libros.php?insertion=ok");
+} catch (\Throwable $e) {
+    error_log("something failed when inserting the book: {$e->getMessage()}");
+    header("Location: ../introducir_libro.php?insertion=error");
+}
 
 exit(0);

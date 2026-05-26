@@ -35,7 +35,8 @@ if ($current_user->get_role() !== 'admin') {
     die("No tienes permisos para esto");
 }
 
-$form_libro = new form_libro();
+$insertion_result = $_GET['insertion'] ?? null;
+$form_libro = new form_libro($insertion_result);
 $view = new html_view();
 echo $view->create($form_libro);
 

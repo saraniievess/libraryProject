@@ -37,7 +37,8 @@ if ($current_user === null) {
     exit(0);
 }
 
-$form_resena = new form_resena();
+$insertion_result = $_GET['insertion'] ?? null;
+$form_resena = new form_resena($insertion_result);
 $view = new html_view();
 echo $view->create($form_resena);
 

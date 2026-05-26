@@ -30,8 +30,9 @@ if (
     null === $current_user
     && !$session_manager->is_visitor()
 ) {
-    header('Location: index.php');
-    exit(0);
+  //  header('Location: index.php');
+   
+   // exit(0);
 }
 
 $user_repository = new user_repository($database_connection);

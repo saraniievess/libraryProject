@@ -48,9 +48,14 @@ $nombre = trim($_POST['nombre']);
 $birthdate = new \DateTime($_POST['fecha']);
 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 $role = trim($_POST['role']);
-$user = new user($nombre, $birthdate, $password, $role);
-$user_repository->insert($user);
 
-header("Location: ../introducir_usuarios.php?origin=new_user&insertion=ok");
+try {
+    $user = new user($nombre, $birthdate, $password, $role);
+    $user_repository->insert($user);
+    header("Location: ../introducir_usuarios.php?origin=new_user&insertion=ok");
+} catch (\Throwable $e) {
+    error_log("something failed when inserting the user: {$e->getMessage()}");
+    header("Location: ../introducir_usuarios.php?origin=new_user&insertion=error");
+}
 
 exit(0);
