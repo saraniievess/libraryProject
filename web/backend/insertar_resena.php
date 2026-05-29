@@ -53,13 +53,15 @@ $fecha = new \DateTime($_POST['fecha']);
 $ranking = (int) $_POST['ranking'];
 $info = trim($_POST['info']);
 
+header("Content-Type: application/json");
+
 try {
     $review = new review($titulo, $usuario, $ranking, $fecha, $info);
     $review_repository->insert($review);
-    header("Location: ../introducir_resenas.php?insertion=ok");
+    echo json_encode(["status" => "ok"]);
 } catch (\Throwable $e) {
     error_log("something failed when inserting the review: {$e->getMessage()}");
-    header("Location: ../introducir_resenas.php?insertion=error");
+    echo json_encode(["status" => "error"]);
 }
 
 exit(0);

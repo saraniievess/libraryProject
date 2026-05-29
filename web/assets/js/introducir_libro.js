@@ -18,6 +18,7 @@ class ui_form_libro {
         this.error_list = _dom_context.querySelector("ul");
         this.form = _dom_context.querySelector("form");
         this.setup_events();
+        this.result = _dom_context.querySelector("[data-role='result']");
     }
 
     setup_events() {
@@ -28,7 +29,27 @@ class ui_form_libro {
         if (!this.validate_form()) {
             return;
         }
-        this.form.submit();
+        let payload = new FormData(this.form);
+        fetch(
+            this.form.action,
+            {
+                method: "POST",
+                body: payload
+            }
+        )
+            .then((_result) => {
+                return _result.json();
+            })
+            .then((_json) => {
+                if (_json.status === "ok") {
+                    this.result.innerText =
+                        "Libro añadido correctamente";
+                }
+                else {
+                    this.result.innerText =
+                        "Ha ocurrido un error";
+                }
+            });
     }
 
     validate_form() {
@@ -52,6 +73,8 @@ class ui_form_libro {
 
         if (0 === this.form.pag_total.value.trim().length) {
             errors.push("Las páginas están vacías");
+        } else if (isNaN(this.form.pag_total.value)) {
+            errors.push("El número de páginas debe ser un número");
         }
 
         this.error_list.innerHTML = "";

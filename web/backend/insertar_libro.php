@@ -51,13 +51,15 @@ $editorial = trim($_POST['editorial']);
 $genero = trim($_POST['genero']);
 $pag_total = (int) $_POST['pag_total'];
 
+header("Content-Type: application/json");
+
 try {
     $book = new book($titulo, $autor, $editorial, $genero, $pag_total);
     $book_repository->insert($book);
-    header("Location: ../introducir_libros.php?insertion=ok");
+    echo json_encode(["status" => "ok"]);
 } catch (\Throwable $e) {
     error_log("something failed when inserting the book: {$e->getMessage()}");
-    header("Location: ../introducir_libro.php?insertion=error");
+    echo json_encode(["status" => "error"]);
 }
 
 exit(0);

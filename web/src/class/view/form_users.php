@@ -103,6 +103,8 @@ class form_users implements app_view_interface
 			<!-- Here be errors -->
 			<ul></ul>
 
+            <p data-role="result"></p>
+
 		</section>
 
                 <br>

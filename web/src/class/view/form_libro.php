@@ -54,6 +54,8 @@ class form_libro implements app_view_interface
 
         <ul></ul>
 
+        <p data-role="result"></p>
+
         </section>
         <br>
         <a href="menu_form.php">Volver</a><br>
