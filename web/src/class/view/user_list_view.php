@@ -22,54 +22,35 @@ class user_list_view implements app_view_interface
 
     public function get_main_view(): string
     {
-        $view_list = "";
-        foreach ($this->users as $user) {
-            $review_uri =
-                "resenas_user.php?username={$user->get_name()}";
-            $edit_form = "";
-            $delete_button = "";
-            $can_edit = false;
-            if ($this->logged_user !== null) {
-                if (
-                    $this->logged_user->get_role() === 'admin'
-                    || $this->logged_user->get_id() === $user->get_id()
-                ) {
-                    $can_edit = true;
-                }
-            }
-
-            if (
-                $this->logged_user !== null
-                && $this->logged_user->get_role() === 'admin'
-            ) {
-                $delete_button = <<<R
-                <button type="button" onclick="confirm_deletion({$user->get_id()})">Borrar</button>
-                R;
-            }
-
-            if ($can_edit) {
-                $edit_form = <<<R
-                <a href="editar_usuario.php?user_id={$user->get_id()}">Modificar</a>
-                R;
-            }
-
-            $view_list .= <<<R
-                <li>
-                    ID: {$user->get_id()} | {$user->get_name()} | {$user->get_birthdate()->format("d-m-Y")}
-                    {$delete_button}
-                    {$edit_form}
-                    <a href="{$review_uri}">Reseñas</a>
-                </li>
-            R;
-        }
-
-        return <<<R
-        <ul>
-            {$view_list}
-        </ul>
+        return <<<HTML
+        <script type="text/javascript" src="assets/js/load_users.js"></script>
         <script type="text/javascript" src="assets/js/delete_user.js"></script>
+
+        <table id="user_table">
+            <thead>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Reseñas</th>
+                <th>Modificar</th>
+                <th>Borrar</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
         <a href="menu.php">Volver</a>
 
-R;
+        <template id="user_table_row">
+            <tr>
+                <td data-content="id"></td>
+                <td data-content="name"></td>
+                <td data-content="birthdate"></td>
+                <td data-content="reviews"></td>
+                <td data-content="edit"></td>
+                <td data-content="delete"></td>
+            </tr>
+        </template>
+HTML;
     }
 }

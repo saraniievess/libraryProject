@@ -6,39 +6,51 @@ use \catalogo\model\book;
 
 class book_list_view implements app_view_interface
 {
-
 	/**
 	 *@param list<book> $books
 	 */
+
 	public function __construct(
 		private array $books
 	) {}
 
 	public function get_title(): string
 	{
-
 		return "Listado de libros";
 	}
 
 	public function get_main_view(): string
 	{
-
-		$view_list = "";
-		foreach ($this->books as $book) {
-
-			$review_uri = "resenas_libro.php?title={$book->get_title()}";
-			$view_list .= <<<R
-
-		<li> ID: {$book->get_id()} | {$book->get_title()} by {$book->get_author()} published by {$book->get_house()}. Pages: {$book->get_page_count()}. Genre: {$book->get_genre()} <a href="{$review_uri}">Reseñas</a></li>
-		R;
-		}
-
 		return <<<R
+		<script type="text/javascript" src="assets/js/load_books.js"></script>
 
-	<ul>
-		{$view_list}
-	</ul>
-	<a href="menu.php">Volver</a>
-	R;
+		<table id="book_table">
+			<thead>
+				<th>ID</th>
+				<th>Título</th>
+				<th>Autor</th>
+				<th>Editorial</th>
+				<th>Páginas</th>
+				<th>Género</th>
+				<th>Reseñas</th>
+			</thead>
+			<tbody></tbody>
+			<tfoot></tfoot>
+		</table>
+
+		<a href="menu.php">Volver</a>
+
+		<template id="book_table_row">
+			<tr>
+				<td data-content="id"></td>
+				<td data-content="title"></td>
+				<td data-content="author"></td>
+				<td data-content="house"></td>
+				<td data-content="page_count"></td>
+				<td data-content="genre"></td>
+				<td data-content="reviews"></td>
+			</tr>
+		</template>
+R;
 	}
 }
