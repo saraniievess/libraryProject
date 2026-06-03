@@ -7,14 +7,6 @@ use \resena\model\user;
 class user_list_view implements app_view_interface
 {
 
-    /**
-     * @param list<user> $users
-     */
-    public function __construct(
-        private array $users,
-        private ?user $logged_user
-    ) {}
-
     public function get_title(): string
     {
         return "Listado de usuarios";

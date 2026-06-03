@@ -37,7 +37,7 @@ if (
 $book_repository = new book_repository($database_connection);
 $books = $book_repository->getAllBooks();
 
-$book_list_view = new book_list_view($books);
+$book_list_view = new book_list_view();
 $view = new html_view();
 echo $view->create($book_list_view);
 

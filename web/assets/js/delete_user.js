@@ -4,6 +4,20 @@ function confirm_deletion(user_id) {
         return;
     }
 
-    window.location.href =
-        "backend/borrar_usuario.php?user_id=" + user_id;
+    fetch(
+        "backend/borrar_usuario.php?user_id=" + user_id,
+        {
+            method: "DELETE"
+        }
+    )
+        .then((_result) => {
+            return _result.json();
+        })
+        .then((_json) => {
+
+            if (_json.status === "ok") {
+
+                location.reload();
+            }
+        });
 }

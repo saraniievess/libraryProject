@@ -36,12 +36,11 @@ class ui_form_users {
 		if (!this.validate_form()) {
 			return;
 		}
-		let payload =
-			new FormData(this.form);
+		let payload = new URLSearchParams(new FormData(this.form))
 		fetch(
 			this.form.action,
 			{
-				method: "POST",
+				method: "PATCH",
 				body: payload
 			}
 		)
@@ -50,11 +49,19 @@ class ui_form_users {
 			})
 			.then((_json) => {
 				if (_json.status === "ok") {
-					this.result.innerText =
-						"Usuario añadido correctamente";
-					this.form.reset();
-				}
-				else {
+					if (
+						this.form.action.includes(
+							"modificar_users.php"
+						)
+					) {
+						this.result.innerText =
+							"Usuario actualizado correctamente";
+					} else {
+						this.result.innerText =
+							"Usuario añadido correctamente";
+						this.form.reset();
+					}
+				} else {
 					this.result.innerText =
 						"Ha ocurrido un error";
 				}

@@ -6,14 +6,6 @@ use \catalogo\model\book;
 
 class book_list_view implements app_view_interface
 {
-	/**
-	 *@param list<book> $books
-	 */
-
-	public function __construct(
-		private array $books
-	) {}
-
 	public function get_title(): string
 	{
 		return "Listado de libros";

@@ -9,12 +9,7 @@ use \resena\model\review;
 
 class review_list_name implements app_view_interface
 {
-
-    /**
-     *@param list<review> $reviews
-     */
     public function __construct(
-        private array $reviews,
         private string $name
     ) {}
 

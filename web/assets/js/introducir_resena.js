@@ -29,12 +29,11 @@ class ui_form_resenas {
         if (!this.validate_form()) {
             return;
         }
-        let payload =
-            new FormData(this.form);
+        let payload = new URLSearchParams(new FormData(this.form))
         fetch(
             this.form.action,
             {
-                method: "POST",
+                method: "PATCH",
                 body: payload
             }
         )

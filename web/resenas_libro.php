@@ -40,7 +40,7 @@ $review_repository = new review_repository($database_connection);
 
 $reviews = $review_repository->findReviewByTitle($title);
 
-$review_list_title = new review_list_title($reviews, $title);
+$review_list_title = new review_list_title($title);
 $view = new html_view();
 echo $view->create($review_list_title);
 

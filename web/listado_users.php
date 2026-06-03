@@ -30,15 +30,15 @@ if (
     null === $current_user
     && !$session_manager->is_visitor()
 ) {
-  //  header('Location: index.php');
-   
-   // exit(0);
+    //  header('Location: index.php');
+
+    // exit(0);
 }
 
 $user_repository = new user_repository($database_connection);
 $users = $user_repository->getAllUsers();
 
-$user_list_view = new user_list_view($users, $current_user);
+$user_list_view = new user_list_view();
 $view = new html_view();
 echo $view->create($user_list_view);
 
