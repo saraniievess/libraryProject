@@ -4,30 +4,16 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \session\session_manager;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
 
 header("Content-Type: application/json");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-
-$database_connection = $pdo_factory->create($config_factory->create_production());
-$session_id = session_id();
-
-if ($session_id === false) {
-    echo json_encode([
-        "logged_in" => false,
-        "role" => null,
-        "user_id" => null
-    ]);
-    exit(0);
-}
-
-$session_manager = new session_manager($database_connection, $session_id);
+$service_provider = new service_provider();
+$session_manager = $service_provider->get_session_manager();
+$current_user = $session_manager->get_logged_in_user();
 $current_user = $session_manager->get_logged_in_user();
 
 if ($current_user === null) {

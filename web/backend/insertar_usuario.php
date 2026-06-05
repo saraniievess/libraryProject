@@ -4,35 +4,27 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \resena\database\user_repository;
 use \resena\model\user;
-use \session\session_manager;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
 
-if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-    $input = file_get_contents("php://input");
-
-    if ($input === false) {
-        exit(0);
-    }
-
-    parse_str($input, $_PATCH);
-}
-
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
-
-$session_id = session_id();
-if ($session_id === false) {
-    header("Content-Type: application/json");
-    echo json_encode(["status" => "error", "message" => "No se pudo obtener la sesión"]);
+if ($_SERVER['REQUEST_METHOD'] !== 'PATCH') {
     exit(0);
 }
-$session_manager = new session_manager($database_connection, $session_id);
+
+$input = file_get_contents("php://input");
+
+if ($input === false) {
+    exit(0);
+}
+
+parse_str($input, $_PATCH);
+
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
+$session_manager = $service_provider->get_session_manager();
 $session_manager->commit_last_activity();
 $current_user = $session_manager->get_logged_in_user();
 
@@ -57,6 +49,12 @@ if (!isset($_PATCH['nombre'])) {
 }
 
 $user_repository = new user_repository($database_connection);
+if (!is_string($_PATCH['fecha'])) {
+    exit(0);
+}
+if (!is_string($_PATCH['password'])) {
+    exit(0);
+}
 if (!is_string($_PATCH['nombre'])) {
     exit(0);
 }
@@ -68,6 +66,8 @@ if (!is_string($_PATCH['role'])) {
 }
 $role = trim($_PATCH['role']);
 
+$service_provider->get_logger()->info($current_user->get_name() . " ha creado al usuario " . $nombre);
+
 header("Content-Type: application/json");
 
 try {
@@ -75,7 +75,7 @@ try {
     $user_repository->insert($user);
     echo json_encode(["status" => "ok"]);
 } catch (\Throwable $e) {
-    error_log("something failed when inserting the user: {$e->getMessage()}");
+    $service_provider->get_logger()->error("Error insertando usuario: {$e->getMessage()}");
     header("Content-Type: application/json");
     echo json_encode(["status" => "error"]);
 }

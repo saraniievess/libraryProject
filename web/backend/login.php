@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \resena\database\user_repository;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
 $user_repository = new user_repository($database_connection);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,6 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 if (isset($_POST['visitor'])) {
+    $service_provider
+        ->get_logger()
+        ->info("Un visitante ha accedido al sistema");
     $_SESSION['is_visitor'] = true;
     header('Location: ../menu.php');
     exit(0);
@@ -45,11 +46,18 @@ if (
         $user->get_password()
     )
 ) {
+    $service_provider
+        ->get_logger()
+        ->warning($name . " ha intentado iniciar sesión");
     header('Location: ../index.php?error=Usuario+o+contraseña+incorrectos');
     exit(0);
 }
 
 $_SESSION['is_visitor'] = false;
+
+$service_provider
+    ->get_logger()
+    ->info($user->get_name() . " ha iniciado sesión");
 
 $statement = $database_connection->prepare(
     "INSERT INTO sessions (

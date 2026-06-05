@@ -6,34 +6,25 @@ namespace backend;
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \resena\database\user_repository;
-use \session\session_manager;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
+
 header("Content-Type: application/json");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
-
-$session_id = session_id();
-if ($session_id === false) {
-    header("Content-Type: application/json");
-    echo json_encode(["status" => "error", "message" => "No se pudo obtener la sesión"]);
-    exit(0);
-}
-$session_manager = new session_manager($database_connection, $session_id);
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
+$session_manager = $service_provider->get_session_manager();
 $session_manager->commit_last_activity();
 $current_user = $session_manager->get_logged_in_user();
-
 
 // Admin
 if (
     null === $current_user
     || $current_user->get_role() !== 'admin'
 ) {
+    $service_provider->get_logger()->warning("Intento de borrado sin permisos");
     header("Content-Type: application/json");
     echo json_encode(["status" => "error", "message" => "No tienes permisos"]);
     exit(0);
@@ -59,6 +50,7 @@ if (null === $user) {
 }
 
 $user_repository->delete($user);
+$service_provider->get_logger()->warning($current_user->get_name() . " ha eliminado al usuario " . $user->get_name());
 header("Content-Type: application/json");
 
 echo json_encode([

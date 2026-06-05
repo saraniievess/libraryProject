@@ -93,6 +93,7 @@ class form_users implements app_view_interface
 			    <input type="password" name="password">
 			    <label for="role">Rol:</label>
 			    <select name="role">
+                    <option value="">--Elige--</option>
 				    <option value="user">Usuario</option>
 				    <option value="admin">Administrador</option>
 			    </select>

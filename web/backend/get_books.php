@@ -7,13 +7,14 @@ session_start();
 use \app\config_factory;
 use \app\pdo_factory;
 use \catalogo\database\book_repository;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
+
 header("Content-Type: application/json");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
 $book_repository = new book_repository($database_connection);
 $books = $book_repository->getAllBooks();
 $data = [];

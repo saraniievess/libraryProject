@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \catalogo\database\book_repository;
 use \catalogo\model\book;
-use \session\session_manager;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
 
@@ -24,18 +22,9 @@ if ($input === false) {
 
 parse_str($input, $_PATCH);
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
-$session_id = session_id();
-
-if ($session_id === false) {
-    header("Content-Type: application/json");
-    echo json_encode(["status" => "error", "message" => "No se pudo obtener la sesión"]);
-    exit(0);
-}
-
-$session_manager = new session_manager($database_connection, $session_id);
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
+$session_manager = $service_provider->get_session_manager();
 $session_manager->commit_last_activity();
 $current_user = $session_manager->get_logged_in_user();
 
@@ -84,9 +73,10 @@ header("Content-Type: application/json");
 try {
     $book = new book($titulo, $autor, $editorial, $genero, $pag_total);
     $book_repository->insert($book);
+    $service_provider->get_logger()->info($current_user->get_name() . " ha creado el libro " . $titulo);
     echo json_encode(["status" => "ok"]);
 } catch (\Throwable $e) {
-    error_log("something failed when inserting the book: {$e->getMessage()}");
+    $service_provider->get_logger()->error("Error insertando libro: {$e->getMessage()}");
     header("Content-Type: application/json");
     echo json_encode(["status" => "error"]);
 }

@@ -4,26 +4,16 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
+use \app\service_provider;
 use \resena\database\user_repository;
-use \resena\model\user;
-use \session\session_manager;
 use \view\html_view;
 use \view\form_users;
 
-
 require_once("src/autoload.php");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
-
-$session_id = session_id();
-if ($session_id === false) {
-	die('No se pudo obtener la sesión');
-}
-$session_manager = new session_manager($database_connection, $session_id);
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
+$session_manager = $service_provider->get_session_manager();
 $current_user = $session_manager->get_logged_in_user();
 $session_manager->commit_last_activity();
 
@@ -34,9 +24,7 @@ if (null === $current_user) {
 }
 
 $user_repository = new user_repository($database_connection);
-
 $user_id = (int)($_GET['user_id'] ?? 0);
-
 $user = $user_repository->findUserById($user_id);
 
 if (null === $user) {

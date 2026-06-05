@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \session\session_manager;
 
 require_once("../src/autoload.php");
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
+$service_provider = new \app\service_provider();
+$session_manager = $service_provider->get_session_manager();
 
-$session_id = session_id();
-if ($session_id === false) {
-    die('No se pudo obtener la sesión');
+$current_user = $session_manager->get_logged_in_user();
+
+if ($current_user !== null) {
+    $service_provider
+        ->get_logger()
+        ->info($current_user->get_name() . " ha cerrado sesión");
 }
-$session_manager = new session_manager($database_connection, $session_id);
+
 $session_manager->logout();
 
 header('Location: ../index.php');

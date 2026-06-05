@@ -22,6 +22,7 @@ class ui_form_users {
 		this.error_list = _dom_context.querySelector("ul");
 		this.form = _dom_context.querySelector("form");
 		this.result = _dom_context.querySelector("[data-role='result']");
+		this.role = _dom_context.querySelector("[name='role']");
 
 		this.setup_events();
 	}
@@ -84,6 +85,12 @@ class ui_form_users {
 			&& 0 === this.form.password.value.trim().length
 		) {
 			errors.push("La contraseña está vacía");
+		}
+
+		if (this.form.action.includes("insertar_usuario.php")
+			&& this.form.role.value === ""
+		) {
+			errors.push("El rol está vacío");
 		}
 
 		this.error_list.innerHTML = "";

@@ -6,21 +6,13 @@ session_start();
 
 require_once("src/autoload.php");
 
-use \app\config_factory;
-use \app\pdo_factory;
-use \session\session_manager;
+use \app\service_provider;
 use \view\html_view;
 use \view\menu_form_view;
 
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
-
-$session_id = session_id();
-if ($session_id === false) {
-    die('No se pudo obtener la sesión');
-}
-$session_manager = new session_manager($database_connection, $session_id);
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
+$session_manager = $service_provider->get_session_manager();
 $current_user = $session_manager->get_logged_in_user();
 $session_manager->commit_last_activity();
 

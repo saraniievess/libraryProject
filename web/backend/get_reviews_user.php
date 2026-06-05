@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 session_start();
 
-use \app\config_factory;
-use \app\pdo_factory;
 use \resena\database\review_repository;
+use \app\service_provider;
 
 require_once("../src/autoload.php");
 
 header("Content-Type: application/json");
 
 $username = $_GET["username"] ?? "";
-$config_factory = new config_factory();
-$pdo_factory = new pdo_factory();
-$database_connection = $pdo_factory->create($config_factory->create_production());
+$service_provider = new service_provider();
+$database_connection = $service_provider->get_database_connection();
 $review_repository = new review_repository($database_connection);
 $reviews = $review_repository->findReviewByName($username);
 $data = [];
